@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "iYKn41u9tkf1OeUQnifUwb8O0NGZzI0ZA1C5zjrVGW0=",
+  "Source": "Zaza.Web",
+  "BasePath": "_content/Zaza.Web",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
