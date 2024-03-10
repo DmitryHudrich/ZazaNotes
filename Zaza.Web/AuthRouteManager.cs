@@ -1,38 +1,112 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff;
+using Zaza.Web.Stuff.DTO.Request;
+using Zaza.Web.Stuff.DTO.Response;
 
 namespace Zaza.Web;
 
-internal class AuthRouteManager(WebApplication app, UserRepository repository) {
-    public void SetRoute() {
-        app.MapPost("/auth/reg", (UserDTORecieve user) => {
+internal static class RoutingHelper {
+    public static string GetName(this HttpContext context) => context.User.FindFirstValue(ClaimTypes.Name) ?? throw new ArgumentNullException(nameof(GetName));
+}
+
+/* TODO:
+ * users crud:
+ * + create (registration)
+ * + get 
+ * - update
+ * + delete
+ * notes crud:
+ * + get all notes
+ * + make note
+ * - change
+ * - delete
+ */
+
+internal sealed class RouteManager(WebApplication app) {
+    public void SetEndpoints() {
+        var repository = app.Services.GetRequiredService<UserRepository>();
+        Auth(repository);
+
+        app.MapGet("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context) => {
+
+            var user = repository.FindByLogin(context.GetName());
+            if (user == null) {
+                const string err = "Authorized user isn't fount in database";
+                logger.LogWarning(new ArgumentNullException(nameof(user)), err);
+                return Results.Problem(detail: err);
+            }
+
+            var dto = new UserBodyResponse(user.Login, user.Info);
+            return Results.Json(dto);
+        });
+
+        app.MapDelete("/user", [Authorize] (HttpContext context) => {
+            var status = repository.DeleteByLogin(context.GetName());
+            if (status) {
+                return Results.Ok();
+            }
+            return Results.BadRequest();
+        });
+
+        app.MapGet("/user/notes", [Authorize] (NoteRepository notesRep, HttpContext context) => {
+            string login = context.GetName();
+            var notes = notesRep.GetNotes(login);
+            return Results.Json(notesRep.GetNotes(login));
+        });
+
+        app.MapPost("/user/notes", [Authorize] (ILogger<RouteManager> logger, HttpContext context, NoteDTO note, NoteRepository notes) => {
+            var res = Results.Ok();
+            var username = context.GetName();
+            var newNote = notes.AddNote(username, note.Title, note.Text);
+
+            if (newNote) {
+                logger.LogDebug($"{username}: new note");
+                return Results.Ok();
+            }
+
+            logger.LogDebug($"{username}: not isn't add");
+            return Results.BadRequest("Note isn't add");
+        });
+
+    }
+
+    private void Auth(UserRepository repository) {
+        app.MapPost("/auth/reg", (ILogger<RouteManager> logger, UserMainDTO user) => {
+            //logger.LogDebug("POST: /auth/reg");
+            if (user.Password == "") {
+                return Results.BadRequest();
+            }
+            logger.LogDebug($"Reg request: {user.ToString()}");
             if (!repository.Add(user)) {
                 return Results.Unauthorized();
             };
+            logger.LogTrace("Reg user ok");
             return Results.Ok();
         });
 
-        app.MapPost("/auth/login", (HttpContext context, UserDTORecieve userDTO) => {
-            string username = userDTO.Username;
-            string password = userDTO.Password;
+        app.MapPost("/auth/login", (ILogger<RouteManager> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
+            var login = loginRequest.Login;
+            var password = loginRequest.Password;
 
-            var user = repository.Users.FirstOrDefault(u => u.Login == username && u.Password == password);
+            var user = repository.FindByLogin(login);
+            logger.LogTrace("User " + user?.Login);
+            if (user == null || user.Password != password) {
+                Results.Unauthorized();
+            }
 
-            return MakeJwt(user, context, StaticStuff.SecureCookieOptions);
+            return TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions);
         });
 
         app.MapGet("/auth/refresh", (HttpContext context) => {
             var username = context.Request.Cookies["X-Username"];
             var refresh = context.Request.Cookies["X-Refresh"] ?? string.Empty;
-            var user = repository.Find(refresh);
+            var user = repository.FindByRefresh(refresh);
             if (user == null) {
                 return "саси";
             }
-            return MakeJwt(user, context, StaticStuff.SecureCookieOptions);
+            return TokenService.MakeJwt(user, context, StaticStuff.SecureCookieOptions);
         });
 
         app.MapGet("/auth/logout", (HttpContext context) => {
@@ -44,29 +118,6 @@ internal class AuthRouteManager(WebApplication app, UserRepository repository) {
 
             return Results.Ok();
         });
-
-
     }
 
-    private string MakeJwt(UserEntity? user, HttpContext context, CookieOptions cookieOptions) {
-        var claims = new List<Claim> { new Claim(ClaimTypes.Name, user!.Login) };
-        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
-        var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.ISSUER,
-                audience: AuthOptions.AUDIENCE,
-                claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromSeconds(10)),
-                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
-                    SecurityAlgorithms.HmacSha256));
-
-        System.Console.WriteLine(DateTime.UtcNow.Add(TimeSpan.FromSeconds(10)));
-        var cookies = context.Response.Cookies;
-
-        var refresh = TokenService.GenerateRefreshToken(180);
-        cookies.Append("X-Username", user.Login, cookieOptions);
-        cookies.Append("X-Access", new JwtSecurityTokenHandler().WriteToken(jwt), cookieOptions);
-        cookies.Append("X-Refresh", refresh.Data, cookieOptions);
-        repository.ChangeRefresh(user, refresh);
-        return new JwtSecurityTokenHandler().WriteToken(jwt);
-    }
 }
