@@ -20,6 +20,7 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -30,6 +31,16 @@ app.UseCors(options => {
 });
 app.UseAuthentication();   // добавление middleware аутентификации 
 app.UseAuthorization();   // добавление middleware авторизации 
+
+app.Use(async (context, next) => {
+    var httpContext = context.Request.HttpContext;
+    var logger = httpContext.RequestServices.GetRequiredService<ILogger<WebApplication>>();
+
+    var endpoint = httpContext.GetEndpoint()?.DisplayName;
+    var method = context.Request.Method;
+    app.Logger.LogDebug($"REQUEST: {endpoint}");
+    await next.Invoke();
+});
 
 new RouteManager(app).SetEndpoints();
 

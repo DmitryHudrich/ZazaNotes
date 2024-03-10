@@ -18,8 +18,7 @@ internal static class TokenService {
     }
 
     public static string MakeJwt(UserEntity user, HttpContext context, CookieOptions cookieOptions) {
-        var logger = context.RequestServices.GetRequiredService<ILogger<HttpContext>>();
-        logger.LogTrace($"user.Login = user.Login");
+        var logger = context.RequestServices.GetRequiredService<ILogger<RouteManager>>();
 
         var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
@@ -30,7 +29,7 @@ internal static class TokenService {
             expires: DateTime.UtcNow.Add(TimeSpan.FromHours(10)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                 SecurityAlgorithms.HmacSha256));
-        System.Console.WriteLine(DateTime.UtcNow.Add(TimeSpan.FromSeconds(10)));
+
         var cookies = context.Response.Cookies;
 
         var refresh = TokenService.GenerateRefreshToken(180);

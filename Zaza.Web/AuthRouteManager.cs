@@ -33,70 +33,91 @@ internal sealed class RouteManager(WebApplication app) {
         app.MapGet("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context) => {
             var user = repository.FindByLogin(context.GetName());
             if (user == null) {
-                const string err = "Authorized user isn't fount in database";
-                logger.LogWarning(new ArgumentNullException(nameof(user)), err);
-                return Results.Problem(detail: err);
+                string err = $"User {context.GetName()} isn't found in db.";
+                logger.LogDebug(new UserNotFoundException(nameof(user)), err);
+                return Results.BadRequest(err);
             }
 
             var dto = new UserBodyResponse(user.Login, user.Info);
             return Results.Json(dto);
         });
 
-        app.MapDelete("/user", [Authorize] (HttpContext context, NoteRepository noteRepository) => {
+        app.MapDelete("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context, NoteRepository noteRepository) => {
             var userStatus = repository.DeleteByLogin(context.GetName());
             var notesStatus = noteRepository.DeleteNotesByLogin(context.GetName());
-            if (userStatus && notesStatus != 0) {
-                return Results.Ok();
+            if (!userStatus || notesStatus == 0) {
+                string err = $"User {context.GetName()} wasn't found or his don't have notes";
+                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus} Note: {notesStatus}"), err);
+                return Results.BadRequest(err);
             }
-            return Results.BadRequest();
+            return Results.Ok();
         });
 
-        app.MapPut("/user", [Authorize] (HttpContext context, UserInfo info, NoteRepository noteRepository) => {
+        app.MapPut("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context, UserInfo info, NoteRepository noteRepository) => {
             var user = context.GetName();
-            return repository.ChangeInfo(user, info) ? Results.Ok() : Results.BadRequest();
+            return repository.ChangeInfo(user, info) ? Results.Ok() : handle();
+            IResult handle() {
+                string err = $"User {context.GetName()} wasn't changed";
+                logger.LogDebug(err);
+                return Results.BadRequest(err);
+            }
         });
 
         app.MapGet("/user/notes", [Authorize] (NoteRepository notesRep, HttpContext context) => {
             string login = context.GetName();
             var notes = notesRep.GetNotes(login);
-            return Results.Json(notesRep.GetNotes(login));
+            return Results.Json(notes);
         });
 
         app.MapPost("/user/notes", [Authorize] (ILogger<RouteManager> logger, HttpContext context, NoteDTO note, NoteRepository notes) => {
             var res = Results.Ok();
             var username = context.GetName();
             var newNote = notes.AddNote(username, note.Title, note.Text);
-
-            if (newNote) {
-                logger.LogDebug($"{username}: new note");
-                return Results.Ok();
+            if (!newNote) {
+                logger.LogDebug($"{username}: note wasn't add");
+                return Results.BadRequest("Note wasn't add");
             }
-
-            logger.LogDebug($"{username}: not isn't add");
-            return Results.BadRequest("Note isn't add");
+            logger.LogDebug($"{username}: new note");
+            return Results.Ok();
         });
 
-        app.MapDelete("/user/notes/{id:guid}", [Authorize] (HttpContext conext, Guid id, NoteRepository repository) => {
-            repository.DeleteNote(id);
+        app.MapDelete("/user/notes/{id:guid}", [Authorize] (ILogger<RouteManager> logger, HttpContext context, Guid id, NoteRepository repository) => {
+            var status = repository.DeleteNote(id);
+
+            if (!status) {
+                string err = $"{context.GetName}: note wasn't deleted";
+                logger.LogDebug(err);
+                return Results.BadRequest(err);
+            }
+            return Results.Ok();
         });
 
-        app.MapPut("/user/notes", [Authorize] (HttpContext context, ChangedNoteDTO dto, NoteRepository notes) => {
-            notes.ChangeNote(dto);
+        app.MapPut("/user/notes", [Authorize] (ILogger<RouteManager> logger, HttpContext context, ChangedNoteDTO dto, NoteRepository notes) => {
+            var status = notes.ChangeNote(dto);
+
+            if (!status) {
+                string err = $"{context.GetName}: note wasn't changed";
+                logger.LogDebug(err);
+                return Results.BadRequest(err);
+            }
+            return Results.Ok();
+
         });
 
     }
 
     private void Auth(UserRepository repository) {
         app.MapPost("/auth/reg", (ILogger<RouteManager> logger, UserMainDTO user) => {
-            //logger.LogDebug("POST: /auth/reg");
-            if (user.Password == "") {
-                return Results.BadRequest();
+            if (string.IsNullOrWhiteSpace(user.Password)) {
+                string err = $"{user.Login}: account don't create, because password must contain more then zero symbols lol ";
+                logger.LogDebug(new ArgumentException(nameof(user.Password)), err);
+                return Results.BadRequest(err);
             }
-            logger.LogDebug($"Reg request: {user.ToString()}");
             if (!repository.Add(user)) {
+                string err = $"{user} wasn't added to database";
+                logger.LogDebug(err);
                 return Results.Unauthorized();
             };
-            logger.LogTrace("Reg user ok");
             return Results.Ok();
         });
 
@@ -105,9 +126,10 @@ internal sealed class RouteManager(WebApplication app) {
             var password = loginRequest.Password;
 
             var user = repository.FindByLogin(login);
-            logger.LogTrace("User " + user?.Login);
             if (user == null || user.Password != password) {
-                Results.Unauthorized();
+                string err = $"User {user} wasn't found or password is incorrect";
+                logger.LogDebug(err);
+                Results.BadRequest(err);
             }
 
             return TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions);

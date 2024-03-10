@@ -4,7 +4,7 @@ using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web;
 
-internal class NoteRepository(ILogger<NoteRepository> logger, UserRepository userRepository) {
+internal sealed class NoteRepository(ILogger<NoteRepository> logger, UserRepository userRepository) : INoteRepository {
     private static List<NoteEntity> notes = [];
 
     public IReadOnlyList<NoteEntity> Notes => notes;
@@ -19,7 +19,9 @@ internal class NoteRepository(ILogger<NoteRepository> logger, UserRepository use
     public int DeleteNotesByLogin(string login) => notes.RemoveAll(note => note.OwnerLogin == login);
 
     public IEnumerable<NoteEntity> GetNotes(string login) {
-        GetUser(login);
+        if (GetUser(login) == UserEntity.Empty) {
+            logger.LogDebug($"{login} don't exists");
+        }
         foreach (var note in notes) {
             if (note.OwnerLogin == login) {
                 yield return note;
@@ -27,13 +29,24 @@ internal class NoteRepository(ILogger<NoteRepository> logger, UserRepository use
         }
     }
 
-    public bool DeleteNote(Guid id) => notes.Remove(notes.FirstOrDefault(note => note.Guid == id));
+    public bool DeleteNote(Guid id) {
+        var note = notes.FirstOrDefault(note => note.Guid == id);
+        if (note == null) {
+            logger.LogDebug("Note with guid:{id} don't exists");
+            return false;
+        }
+        var res = notes.Remove(note);
+        if (!res) {
+            logger.LogDebug("Remove operation ne poluchilas");
+            return false;
+        }
+        return true;
+    }
 
     public bool ChangeNote(ChangedNoteDTO newNote) {
-        logger.LogDebug($"Note change request: {newNote.ToString()}");
-
         var note = notes.FirstOrDefault(n => n.Guid == newNote.Guid);
         if (note == null) {
+            logger.LogDebug($"Note was not found");
             return false;
         }
         note = note with { Creation = note.Creation, Title = newNote.Title, Text = newNote.Text };
@@ -42,13 +55,6 @@ internal class NoteRepository(ILogger<NoteRepository> logger, UserRepository use
         logger.LogDebug("Added note: " + notes.FirstOrDefault(note => note.Guid == newNote.Guid)?.ToString());
         return true;
     }
-
-    public void ChangeOwner(string oldOwner, string newOwner) =>
-        notes.ForEach(note => {
-            if (note.OwnerLogin == oldOwner) {
-                note = note with { OwnerLogin = newOwner };
-            }
-        });
 
     private UserEntity GetUser(string login) {
         var user = userRepository.FindByLogin(login);

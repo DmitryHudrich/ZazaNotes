@@ -2,7 +2,7 @@ using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.DataBase.Repository;
 
-internal class UserRepository(ILogger<UserRepository> logger) {
+internal class UserRepository(ILogger<UserRepository> logger) : IUserRepository {
     private static List<UserEntity> users = [];
 
     public IReadOnlyList<UserEntity> Users => users;

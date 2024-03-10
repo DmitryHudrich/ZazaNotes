@@ -39,3 +39,4 @@
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.sourcelink.json
