@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
@@ -15,13 +16,13 @@ internal static class RoutingHelper {
  * users crud:
  * + create (registration)
  * + get 
- * - update
+ * + update
  * + delete
  * notes crud:
  * + get all notes
  * + make note
- * - change
- * - delete
+ * + change
+ * + delete
  */
 
 internal sealed class RouteManager(WebApplication app) {
@@ -30,7 +31,6 @@ internal sealed class RouteManager(WebApplication app) {
         Auth(repository);
 
         app.MapGet("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context) => {
-
             var user = repository.FindByLogin(context.GetName());
             if (user == null) {
                 const string err = "Authorized user isn't fount in database";
@@ -42,12 +42,18 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Json(dto);
         });
 
-        app.MapDelete("/user", [Authorize] (HttpContext context) => {
-            var status = repository.DeleteByLogin(context.GetName());
-            if (status) {
+        app.MapDelete("/user", [Authorize] (HttpContext context, NoteRepository noteRepository) => {
+            var userStatus = repository.DeleteByLogin(context.GetName());
+            var notesStatus = noteRepository.DeleteNotesByLogin(context.GetName());
+            if (userStatus && notesStatus != 0) {
                 return Results.Ok();
             }
             return Results.BadRequest();
+        });
+
+        app.MapPut("/user", [Authorize] (HttpContext context, UserInfo info, NoteRepository noteRepository) => {
+            var user = context.GetName();
+            return repository.ChangeInfo(user, info) ? Results.Ok() : Results.BadRequest();
         });
 
         app.MapGet("/user/notes", [Authorize] (NoteRepository notesRep, HttpContext context) => {
@@ -68,6 +74,14 @@ internal sealed class RouteManager(WebApplication app) {
 
             logger.LogDebug($"{username}: not isn't add");
             return Results.BadRequest("Note isn't add");
+        });
+
+        app.MapDelete("/user/notes/{id:guid}", [Authorize] (HttpContext conext, Guid id, NoteRepository repository) => {
+            repository.DeleteNote(id);
+        });
+
+        app.MapPut("/user/notes", [Authorize] (HttpContext context, ChangedNoteDTO dto, NoteRepository notes) => {
+            notes.ChangeNote(dto);
         });
 
     }

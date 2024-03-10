@@ -27,6 +27,17 @@ internal class UserRepository(ILogger<UserRepository> logger) {
         return false;
     }
 
+    public bool ChangeInfo(string login, UserInfo newInfo) {
+        var user = FindByLogin(login);
+        if (user == null) {
+            return false;
+        }
+        users.Remove(user);
+        user = user with { Info = newInfo };
+        users.Add(user);
+        return true;
+    }
+
     public void ChangeRefresh(UserEntity user, RefreshToken refresh) {
         logger.LogDebug($"{user.Login}: RefreshToken was refreshed:");
         var userIndex = users.FindIndex(0, usr => usr.Login == user.Login);
