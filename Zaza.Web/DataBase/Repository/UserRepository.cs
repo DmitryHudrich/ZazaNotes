@@ -32,7 +32,6 @@ internal class UserRepository(ILogger<UserRepository> logger) : IUserRepository 
         logger.LogTrace("Users count: " + users.Count + " Last user: " + users.Last().Login);
         return true;
     }
-    //
 
     public bool DeleteByLogin(string login) {
         var user = FindByLogin(login);
