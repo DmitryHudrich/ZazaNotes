@@ -21,6 +21,7 @@ internal class UserRepository(ILogger<UserRepository> logger) : IUserRepository 
         return true;
     }
 
+
     public bool Add(UserMainDTO user) {
         if (users.FirstOrDefault(obj => obj.Login == user.Login) != null) {
             logger.LogDebug($"User: {user.Login} isn't exist");
@@ -31,6 +32,7 @@ internal class UserRepository(ILogger<UserRepository> logger) : IUserRepository 
         logger.LogTrace("Users count: " + users.Count + " Last user: " + users.Last().Login);
         return true;
     }
+    //
 
     public bool DeleteByLogin(string login) {
         var user = FindByLogin(login);
