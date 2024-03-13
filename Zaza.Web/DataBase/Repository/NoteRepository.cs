@@ -4,7 +4,7 @@ using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web;
 
-internal sealed class NoteRepository(ILogger<NoteRepository> logger, UserRepository userRepository) : INoteRepository {
+internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserRepository userRepository) : INoteRepository {
     private static List<NoteEntity> notes = [];
 
     public IReadOnlyList<NoteEntity> Notes => notes;

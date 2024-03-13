@@ -25,51 +25,17 @@ internal static class RoutingHelper {
  * + delete
  */
 
-internal sealed class RouteManager(WebApplication app) {
-    public void SetEndpoints() {
-        var repository = app.Services.GetRequiredService<UserRepository>();
-        Auth(repository);
+internal static class RouteManager {
+    private static IEndpointRouteBuilder app = WebApplication.Create();
+    public static void SetEndpoints(IEndpointRouteBuilder webApp) {
+        app = webApp;
+        Auth();
+        User();
+        Notes();
+    }
 
-        app.MapGet("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context) => {
-            var user = repository.FindByLogin(context.GetName());
-            if (user == null) {
-                string err = $"User {context.GetName()} isn't found in db.";
-                logger.LogDebug(new UserNotFoundException(nameof(user)), err);
-                return Results.BadRequest(err);
-            }
-
-            var dto = new UserBodyResponse(user.Login, user.Info);
-            return Results.Json(dto);
-        });
-
-        app.MapDelete("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context, NoteRepository noteRepository) => {
-            var userStatus = repository.DeleteByLogin(context.GetName());
-            var notesStatus = noteRepository.DeleteNotesByLogin(context.GetName());
-            if (!userStatus || notesStatus == 0) {
-                string err = $"User {context.GetName()} wasn't found or his don't have notes";
-                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus} Note: {notesStatus}"), err);
-                return Results.BadRequest(err);
-            }
-            return Results.Ok();
-        });
-
-        app.MapPut("/user", [Authorize] (ILogger<RouteManager> logger, HttpContext context, UserInfo info, NoteRepository noteRepository) => {
-            var user = context.GetName();
-            return repository.ChangeInfo(user, info) ? Results.Ok() : handle();
-            IResult handle() {
-                string err = $"User {context.GetName()} wasn't changed";
-                logger.LogDebug(err);
-                return Results.BadRequest(err);
-            }
-        });
-
-        app.MapGet("/user/notes", [Authorize] (NoteRepository notesRep, HttpContext context) => {
-            string login = context.GetName();
-            var notes = notesRep.GetNotes(login);
-            return Results.Json(notes);
-        });
-
-        app.MapPost("/user/notes", [Authorize] (ILogger<RouteManager> logger, HttpContext context, NoteDTO note, NoteRepository notes) => {
+    private static void Notes() {
+        app.MapPost("/user/notes", [Authorize] (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
             var res = Results.Ok();
             var username = context.GetName();
             var newNote = notes.AddNote(username, note.Title, note.Text);
@@ -81,7 +47,7 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Ok();
         });
 
-        app.MapDelete("/user/notes/{id:guid}", [Authorize] (ILogger<RouteManager> logger, HttpContext context, Guid id, NoteRepository repository) => {
+        app.MapDelete("/user/notes/{id:guid}", [Authorize] (ILogger<RouteEndpoint> logger, HttpContext context, Guid id, INoteRepository repository) => {
             var status = repository.DeleteNote(id);
 
             if (!status) {
@@ -92,7 +58,7 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Ok();
         });
 
-        app.MapPut("/user/notes", [Authorize] (ILogger<RouteManager> logger, HttpContext context, ChangedNoteDTO dto, NoteRepository notes) => {
+        app.MapPut("/user/notes", [Authorize] (ILogger<RouteEndpoint> logger, HttpContext context, ChangedNoteDTO dto, INoteRepository notes) => {
             var status = notes.ChangeNote(dto);
 
             if (!status) {
@@ -103,11 +69,59 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Ok();
 
         });
-
     }
 
-    private void Auth(UserRepository repository) {
-        app.MapPost("/auth/reg", (ILogger<RouteManager> logger, UserMainDTO user) => {
+    private static void User() {
+        app.MapGet("/user", [Authorize] (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
+            var user = repository.FindByLogin(context.GetName());
+            if (user == null) {
+                string err = $"User {context.GetName()} isn't found in db.";
+                logger.LogDebug(new UserNotFoundException(nameof(user)), err);
+                return Results.BadRequest(err);
+            }
+
+            var dto = new UserBodyResponse(user.Login, user.Info);
+            return Results.Json(dto);
+        });
+
+        app.MapDelete("/user", [Authorize] (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
+            var userStatus = repository.DeleteByLogin(context.GetName());
+            var notesStatus = noteRepository.DeleteNotesByLogin(context.GetName());
+            if (!userStatus || notesStatus == 0) {
+                string err = $"User {context.GetName()} wasn't found or his don't have notes";
+                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus} Note: {notesStatus}"), err);
+                return Results.BadRequest(err);
+            }
+            return Results.Ok();
+        });
+
+        app.MapPut("/user", [Authorize] (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserInfo info, INoteRepository noteRepository) => {
+            var user = context.GetName();
+            return repository.ChangeInfo(user, info) ? Results.Ok() : handle();
+            IResult handle() {
+                string err = $"User {context.GetName()} wasn't changed";
+                logger.LogDebug(err);
+                return Results.BadRequest(err);
+            }
+        });
+
+        app.MapGet("/user/notes", [Authorize] (INoteRepository notesRep, HttpContext context) => {
+            string login = context.GetName();
+            var notes = notesRep.GetNotes(login);
+            return Results.Json(notes);
+        });
+    }
+
+    private static void Auth() {
+        //  TODO: смену пароля сделать
+        app.MapPost("/auth/password", [Authorize] (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
+            if (!repository.ChangePassword(context.GetName(), user.OldPassword, user.NewPassword)) {
+                return Results.BadRequest(""); // TODO: дописать ошибку
+            }
+            return Results.Ok(repository.Users.FirstOrDefault(user => user.Login == context.GetName()));
+        });
+
+        app.MapPost("/auth/reg", (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
                 string err = $"{user.Login}: account don't create, because password must contain more then zero symbols lol ";
                 logger.LogDebug(new ArgumentException(nameof(user.Password)), err);
@@ -121,7 +135,7 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Ok();
         });
 
-        app.MapPost("/auth/login", (ILogger<RouteManager> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
+        app.MapPost("/auth/login", (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
             var login = loginRequest.Login;
             var password = loginRequest.Password;
 
@@ -135,7 +149,7 @@ internal sealed class RouteManager(WebApplication app) {
             return TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions);
         });
 
-        app.MapGet("/auth/refresh", (HttpContext context) => {
+        app.MapGet("/auth/refresh", (IUserRepository repository, HttpContext context) => {
             var username = context.Request.Cookies["X-Username"];
             var refresh = context.Request.Cookies["X-Refresh"] ?? string.Empty;
             var user = repository.FindByRefresh(refresh);
@@ -155,5 +169,4 @@ internal sealed class RouteManager(WebApplication app) {
             return Results.Ok();
         });
     }
-
 }

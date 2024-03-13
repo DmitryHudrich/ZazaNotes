@@ -5,6 +5,7 @@ namespace Zaza.Web.DataBase.Repository;
 internal interface IUserRepository {
     IReadOnlyList<UserEntity> Users { get; }
 
+    public bool ChangePassword(string login, string oldPassword, string newPassword);
     bool Add(UserMainDTO user);
     bool ChangeInfo(string login, UserInfo newInfo);
     void ChangeRefresh(UserEntity user, RefreshToken refresh);

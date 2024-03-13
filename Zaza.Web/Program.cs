@@ -11,11 +11,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(StaticStuff.JwtBearerOptions);
 
-builder.Services.AddTransient<UserRepository>();
-builder.Services.AddTransient<NoteRepository>();
-builder.Services.AddLogging(conf => {
-    conf.SetMinimumLevel(LoadLogLevel());
-});
+builder.Services.AddLogging(conf => conf.SetMinimumLevel(LoadLogLevel()));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddCors();
 
 var app = builder.Build();
@@ -42,7 +41,7 @@ app.Use(async (context, next) => {
     await next.Invoke();
 });
 
-new RouteManager(app).SetEndpoints();
+RouteManager.SetEndpoints(app);
 
 app.Run();
 

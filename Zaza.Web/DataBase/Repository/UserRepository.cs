@@ -7,6 +7,20 @@ internal class UserRepository(ILogger<UserRepository> logger) : IUserRepository 
 
     public IReadOnlyList<UserEntity> Users => users;
 
+    public bool ChangePassword(string login, string oldPassword, string newPassword) {
+        var i = users.FindIndex(0, user => user.Login == login);
+        var user = users[i];
+
+        if (user.Password != oldPassword) {
+            logger.LogDebug($"User {login}: password is incorrect or user not found.");
+            return false;
+        }
+
+        users[i] = user with { Password = newPassword };
+
+        return true;
+    }
+
     public bool Add(UserMainDTO user) {
         if (users.FirstOrDefault(obj => obj.Login == user.Login) != null) {
             logger.LogDebug($"User: {user.Login} isn't exist");

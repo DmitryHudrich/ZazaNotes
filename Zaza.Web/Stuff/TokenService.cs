@@ -18,7 +18,7 @@ internal static class TokenService {
     }
 
     public static string MakeJwt(UserEntity user, HttpContext context, CookieOptions cookieOptions) {
-        var logger = context.RequestServices.GetRequiredService<ILogger<RouteManager>>();
+        var logger = context.RequestServices.GetRequiredService<ILogger<JwtSecurityToken>>();
 
         var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
@@ -36,7 +36,7 @@ internal static class TokenService {
         cookies.Append("X-Username", user.Login, cookieOptions);
         cookies.Append("X-Access", new JwtSecurityTokenHandler().WriteToken(jwt), cookieOptions);
         cookies.Append("X-Refresh", refresh.Data, cookieOptions);
-        context.RequestServices.GetRequiredService<UserRepository>().ChangeRefresh(user, refresh);
+        context.RequestServices.GetRequiredService<IUserRepository>().ChangeRefresh(user, refresh);
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
