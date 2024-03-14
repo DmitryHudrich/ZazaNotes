@@ -75,8 +75,9 @@ internal static class RouteManager {
     }
 
     private static void User() {
-        app.MapGet("/user", [Authorize] (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
-            var user = repository.FindByLogin(context.GetName());
+        app.MapGet("/user", [Authorize]
+        async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
+            var user = await repository.FindByLoginAsync(context.GetName());
             if (user == null) {
                 string err = $"User {context.GetName()} isn't found in db.";
                 logger.LogDebug(new UserNotFoundException(nameof(user)), err);
@@ -89,7 +90,7 @@ internal static class RouteManager {
 
         app.MapDelete("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
-            var userStatus = repository.DeleteByLogin(context.GetName());
+            var userStatus = await repository.DeleteByLoginAsync(context.GetName());
             var notesStatus = await noteRepository.DeleteNotesByLoginAsync(context.GetName());
             if (!userStatus || notesStatus == 0) {
                 string err = $"User {context.GetName()} wasn't found or his don't have notes";
@@ -99,9 +100,10 @@ internal static class RouteManager {
             return Results.Ok();
         });
 
-        app.MapPut("/user", [Authorize] (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserInfo info, INoteRepository noteRepository) => {
+        app.MapPut("/user", [Authorize]
+        async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserInfo info, INoteRepository noteRepository) => {
             var user = context.GetName();
-            return repository.ChangeInfo(user, info) ? Results.Ok() : handle();
+            return await repository.ChangeInfoAsync(user, info) ? Results.Ok() : handle();
             IResult handle() {
                 string err = $"User {context.GetName()} wasn't changed";
                 logger.LogDebug(err);
@@ -118,20 +120,21 @@ internal static class RouteManager {
 
     private static void Auth() {
         //  TODO: смену пароля сделать
-        app.MapPost("/auth/password", [Authorize] (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
-            if (!repository.ChangePassword(context.GetName(), user.OldPassword, user.NewPassword)) {
+        app.MapPost("/auth/password", [Authorize]
+        async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
+            if (!await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)) {
                 return Results.BadRequest(""); // TODO: дописать ошибку
             }
-            return Results.Ok(repository.Users.FirstOrDefault(user => user.Login == context.GetName()));
+            return Results.Ok();
         });
 
-        app.MapPost("/auth/reg", (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
+        app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
                 string err = $"{user.Login}: account don't create, because password must contain more then zero symbols lol ";
                 logger.LogDebug(new ArgumentException(nameof(user.Password)), err);
                 return Results.BadRequest(err);
             }
-            if (!repository.Add(user)) {
+            if (!await repository.AddAsync(user)) {
                 string err = $"{user} wasn't added to database";
                 logger.LogDebug(err);
                 return Results.Unauthorized();
@@ -139,11 +142,11 @@ internal static class RouteManager {
             return Results.Ok();
         });
 
-        app.MapPost("/auth/login", (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
+        app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
             var login = loginRequest.Login;
             var password = loginRequest.Password;
 
-            var user = repository.FindByLogin(login);
+            var user = await repository.FindByLoginAsync(login);
             if (user == null || user.Password != password) {
                 string err = $"User {user} wasn't found or password is incorrect";
                 logger.LogDebug(err);
@@ -153,10 +156,10 @@ internal static class RouteManager {
             return TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions);
         });
 
-        app.MapGet("/auth/refresh", (IUserRepository repository, HttpContext context) => {
+        app.MapGet("/auth/refresh", async (IUserRepository repository, HttpContext context) => {
             var username = context.Request.Cookies["X-Username"];
             var refresh = context.Request.Cookies["X-Refresh"] ?? string.Empty;
-            var user = repository.FindByRefresh(refresh);
+            var user = await repository.FindByRefreshAsync(refresh);
             if (user == null) {
                 return "саси";
             }

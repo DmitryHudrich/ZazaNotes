@@ -3,15 +3,13 @@ using Zaza.Web.Stuff.DTO.Request;
 namespace Zaza.Web.DataBase.Repository;
 
 internal interface IUserRepository {
-    IReadOnlyList<UserEntity> Users { get; }
-
-    public bool ChangePassword(string login, string oldPassword, string newPassword);
-    bool Add(UserMainDTO user);
-    bool ChangeInfo(string login, UserInfo newInfo);
-    void ChangeRefresh(UserEntity user, RefreshToken refresh);
-    bool DeleteByLogin(string login);
-    UserEntity? Find(UserMainDTO dto);
-    UserEntity? FindByLogin(string login);
-    UserEntity? FindByRefresh(string refreshToken);
+    Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword);
+    Task<bool> AddAsync(UserMainDTO user);
+    Task<bool> ChangeInfoAsync(string login, UserInfo newInfo);
+    Task ChangeRefreshAsync(UserEntity user, RefreshToken refresh);
+    Task<bool> DeleteByLoginAsync(string login);
+    Task<UserEntity?> FindAsync(UserMainDTO dto);
+    Task<UserEntity?> FindByLoginAsync(string login);
+    Task<UserEntity?> FindByRefreshAsync(string refreshToken);
 }
 

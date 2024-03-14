@@ -55,7 +55,7 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
     }
 
     private async Task<UserEntity> GetUserAsync(string login) {
-        var user = userRepository.FindByLogin(login);
+        var user = await userRepository.FindByLoginAsync(login);
         if (user == null) {
             var err = $"{login} isn't exist";
             logger.LogDebug(err);

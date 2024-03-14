@@ -36,7 +36,7 @@ internal static class TokenService {
         cookies.Append("X-Username", user.Login, cookieOptions);
         cookies.Append("X-Access", new JwtSecurityTokenHandler().WriteToken(jwt), cookieOptions);
         cookies.Append("X-Refresh", refresh.Data, cookieOptions);
-        context.RequestServices.GetRequiredService<IUserRepository>().ChangeRefresh(user, refresh);
+        context.RequestServices.GetRequiredService<IUserRepository>().ChangeRefreshAsync(user, refresh);
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
