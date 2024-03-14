@@ -28,7 +28,7 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
     }
 
     public async Task<bool> DeleteNoteAsync(Guid id) {
-        var note = notes.FirstOrDefault(note => note.Guid == id);
+        var note = notes.FirstOrDefault(note => note.Id == id);
         if (note == null) {
             logger.LogDebug("Note with guid:{id} don't exists");
             return false;
@@ -42,15 +42,15 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
     }
 
     public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote) {
-        var note = notes.FirstOrDefault(n => n.Guid == newNote.Guid);
+        var note = notes.FirstOrDefault(n => n.Id == newNote.Guid);
         if (note == null) {
             logger.LogDebug($"Note was not found");
             return false;
         }
         note = note with { Creation = note.Creation, Title = newNote.Title, Text = newNote.Text };
-        int i = notes.FindIndex(0, note => note.Guid == newNote.Guid);
+        int i = notes.FindIndex(0, note => note.Id == newNote.Guid);
         notes[i] = note;
-        logger.LogDebug("Added note: " + notes.FirstOrDefault(note => note.Guid == newNote.Guid)?.ToString());
+        logger.LogDebug("Added note: " + notes.FirstOrDefault(note => note.Id == newNote.Guid)?.ToString());
         return true;
     }
 

@@ -40,3 +40,16 @@
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.sourcelink.json
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/AWSSDK.Core.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/AWSSDK.SecurityToken.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/DnsClient.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/MongoDB.Bson.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/MongoDB.Driver.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/MongoDB.Driver.Core.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/MongoDB.Libmongocrypt.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/SharpCompress.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/Snappier.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/ZstdSharp.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/runtimes/linux/native/libmongocrypt.so
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/runtimes/osx/native/libmongocrypt.dylib
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/bin/Debug/net8.0/runtimes/win/native/mongocrypt.dll
