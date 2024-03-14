@@ -5,9 +5,7 @@ namespace Zaza.Web;
 
 internal interface INoteRepository {
     Task<bool> AddNoteAsync(string login, string title, string text);
-    Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote);
+    Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote, string login);
     Task<bool> DeleteNoteAsync(Guid id);
-    Task<int> DeleteNotesByLoginAsync(string login);
-    IAsyncEnumerable<NoteEntity> GetNotesAsync(string login);
+    Task<List<NoteEntity>> GetNotesAsync(string login);
 }
-

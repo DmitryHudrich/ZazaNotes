@@ -1,4 +1,3 @@
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Zaza.Web.Stuff.DTO.Request;
 
@@ -17,15 +16,13 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
             return false;
         }
         return true;
-
     }
 
     public async Task<bool> AddAsync(UserMainDTO user) {
         var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login, user.Password, Stuff.TokenService.GenerateRefreshToken(180));
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
-
-        if (exists != null) {
+        if (exists.Any()) {
             logger.LogDebug($"User: {user.Login} already exists");
             return false;
         }
@@ -74,19 +71,19 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
             Builders<UserEntity>.Filter.Eq(u => u.Login, dto.Login) &
             Builders<UserEntity>.Filter.Eq(u => u.Password, dto.Password);
         var res = await mongo.Users.FindAsync(filter);
-        return res.Single();
+        return res.First();
 
     }
     public async Task<UserEntity?> FindByLoginAsync(string login) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login);
         var res = await mongo.Users.FindAsync(filter);
-        return res.Single();
+        return res.First();
     }
     public async Task<UserEntity?> FindByRefreshAsync(string refreshToken) {
         var filer =
             Builders<UserEntity>.Filter.Eq(u => u.RefreshToken.Data, refreshToken);
         var res = await mongo.Users.FindAsync(filer);
-        return res.Single();
+        return res.First();
     }
 }

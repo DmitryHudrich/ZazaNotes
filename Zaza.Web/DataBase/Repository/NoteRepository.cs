@@ -1,66 +1,54 @@
-﻿using Zaza.Web.DataBase;
+﻿using MongoDB.Driver;
+using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web;
 
-internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserRepository userRepository) : INoteRepository {
-    private static List<NoteEntity> notes = [];
-
+internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserRepository userRepository, MongoService mongo) : INoteRepository {
     public async Task<bool> AddNoteAsync(string login, string title, string text) {
-        var user = await GetUserAsync(login);
-        notes.Add(new NoteEntity(Guid.NewGuid(), user.Login, user.Info, DateTime.Now, title, text));
-        logger.LogDebug($"User {login} added a note: {title}");
-        return true;
+        var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, login);
+        var update = Builders<UserEntity>.Update.Push(u => u.Notes, new NoteEntity(Guid.NewGuid(), title, text));
+        var updateResult = await mongo.Users.UpdateOneAsync(filter, update);
+
+        return updateResult.ModifiedCount > 0;
     }
 
-    public async Task<int> DeleteNotesByLoginAsync(string login) => notes.RemoveAll(note => note.OwnerLogin == login);
-
-    public async IAsyncEnumerable<NoteEntity> GetNotesAsync(string login) {
-        if (await GetUserAsync(login) == UserEntity.Empty) {
-            logger.LogDebug($"{login} don't exists");
+    public async Task<List<NoteEntity>> GetNotesAsync(string login) {
+        var user = await GetUserAsync(login);
+        if (user == null) {
+            return [];
         }
-        foreach (var note in notes) {
-            if (note.OwnerLogin == login) {
-                yield return note;
-            }
-        }
+        return user.Notes;
     }
 
     public async Task<bool> DeleteNoteAsync(Guid id) {
-        var note = notes.FirstOrDefault(note => note.Id == id);
-        if (note == null) {
-            logger.LogDebug("Note with guid:{id} don't exists");
-            return false;
-        }
-        var res = notes.Remove(note);
-        if (!res) {
-            logger.LogDebug("Remove operation ne poluchilas");
-            return false;
-        }
-        return true;
+        var filter = Builders<UserEntity>.Filter.ElemMatch(u => u.Notes, Builders<NoteEntity>.Filter.Eq(n => n.Id, id));
+        var update = Builders<UserEntity>.Update.PullFilter(u => u.Notes, Builders<NoteEntity>.Filter.Eq(n => n.Id, id));
+
+        var res = await mongo.Users.FindOneAndUpdateAsync(filter, update);
+        return res != null;
     }
 
-    public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote) {
-        var note = notes.FirstOrDefault(n => n.Id == newNote.Guid);
-        if (note == null) {
-            logger.LogDebug($"Note was not found");
-            return false;
-        }
-        note = note with { Creation = note.Creation, Title = newNote.Title, Text = newNote.Text };
-        int i = notes.FindIndex(0, note => note.Id == newNote.Guid);
-        notes[i] = note;
-        logger.LogDebug("Added note: " + notes.FirstOrDefault(note => note.Id == newNote.Guid)?.ToString());
-        return true;
+    public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote, string login) {
+        // Фильтр для нахождения пользователя по логину и заметки по GUID
+        var filter = Builders<UserEntity>.Filter.And(
+            Builders<UserEntity>.Filter.Eq(u => u.Login, login),
+            Builders<UserEntity>.Filter.ElemMatch(u => u.Notes, Builders<NoteEntity>.Filter.Eq(n => n.Id, newNote.Guid))
+        );
+
+        // Обновление для изменения заголовка и текста заметки
+        var update = Builders<UserEntity>.Update.Set("Notes.$", new NoteEntity(newNote.Guid, newNote.Title, newNote.Text));
+
+        // Выполняем запрос к базе данных MongoDB
+        var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
+
+        // Возвращаем результат операции
+        return result != null;
     }
 
-    private async Task<UserEntity> GetUserAsync(string login) {
-        var user = await userRepository.FindByLoginAsync(login);
-        if (user == null) {
-            var err = $"{login} isn't exist";
-            logger.LogDebug(err);
-            return UserEntity.Empty;
-        }
-        return user;
+    private async Task<UserEntity?> GetUserAsync(string login) {
+        var res = userRepository.FindByLoginAsync(login).Result;
+        return res;
     }
 }

@@ -62,7 +62,7 @@ internal static class RouteManager {
 
         app.MapPut("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, ChangedNoteDTO dto, INoteRepository notes) => {
-            var status = await notes.ChangeNoteAsync(dto);
+            var status = await notes.ChangeNoteAsync(dto, context.GetName());
 
             if (!status) {
                 string err = $"{context.GetName}: note wasn't changed";
@@ -91,10 +91,9 @@ internal static class RouteManager {
         app.MapDelete("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
             var userStatus = await repository.DeleteByLoginAsync(context.GetName());
-            var notesStatus = await noteRepository.DeleteNotesByLoginAsync(context.GetName());
-            if (!userStatus || notesStatus == 0) {
+            if (!userStatus) {
                 string err = $"User {context.GetName()} wasn't found or his don't have notes";
-                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus} Note: {notesStatus}"), err);
+                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
                 return Results.BadRequest(err);
             }
             return Results.Ok();
@@ -111,9 +110,10 @@ internal static class RouteManager {
             }
         });
 
-        app.MapGet("/user/notes", [Authorize] (INoteRepository notesRep, HttpContext context) => {
+        app.MapGet("/user/notes", [Authorize]
+        async (INoteRepository notesRep, HttpContext context) => {
             string login = context.GetName();
-            var notes = notesRep.GetNotesAsync(login);
+            var notes = await notesRep.GetNotesAsync(login);
             return Results.Json(notes);
         });
     }
