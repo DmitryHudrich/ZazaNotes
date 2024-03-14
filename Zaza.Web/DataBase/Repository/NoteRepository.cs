@@ -7,19 +7,17 @@ namespace Zaza.Web;
 internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserRepository userRepository) : INoteRepository {
     private static List<NoteEntity> notes = [];
 
-    public IReadOnlyList<NoteEntity> Notes => notes;
-
-    public bool AddNote(string login, string title, string text) {
-        var user = GetUser(login);
+    public async Task<bool> AddNoteAsync(string login, string title, string text) {
+        var user = await GetUserAsync(login);
         notes.Add(new NoteEntity(Guid.NewGuid(), user.Login, user.Info, DateTime.Now, title, text));
         logger.LogDebug($"User {login} added a note: {title}");
         return true;
     }
 
-    public int DeleteNotesByLogin(string login) => notes.RemoveAll(note => note.OwnerLogin == login);
+    public async Task<int> DeleteNotesByLoginAsync(string login) => notes.RemoveAll(note => note.OwnerLogin == login);
 
-    public IEnumerable<NoteEntity> GetNotes(string login) {
-        if (GetUser(login) == UserEntity.Empty) {
+    public async IAsyncEnumerable<NoteEntity> GetNotesAsync(string login) {
+        if (await GetUserAsync(login) == UserEntity.Empty) {
             logger.LogDebug($"{login} don't exists");
         }
         foreach (var note in notes) {
@@ -29,7 +27,7 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
         }
     }
 
-    public bool DeleteNote(Guid id) {
+    public async Task<bool> DeleteNoteAsync(Guid id) {
         var note = notes.FirstOrDefault(note => note.Guid == id);
         if (note == null) {
             logger.LogDebug("Note with guid:{id} don't exists");
@@ -43,7 +41,7 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
         return true;
     }
 
-    public bool ChangeNote(ChangedNoteDTO newNote) {
+    public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote) {
         var note = notes.FirstOrDefault(n => n.Guid == newNote.Guid);
         if (note == null) {
             logger.LogDebug($"Note was not found");
@@ -56,7 +54,7 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
         return true;
     }
 
-    private UserEntity GetUser(string login) {
+    private async Task<UserEntity> GetUserAsync(string login) {
         var user = userRepository.FindByLogin(login);
         if (user == null) {
             var err = $"{login} isn't exist";
