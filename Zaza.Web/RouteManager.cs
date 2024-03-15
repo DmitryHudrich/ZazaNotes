@@ -15,7 +15,7 @@ internal static class RoutingHelper {
 }
 
 internal static class RouteManager {
-    private static IEndpointRouteBuilder app = WebApplication.Create();
+    private static IEndpointRouteBuilder app = null!;
     public static void SetEndpoints(IEndpointRouteBuilder webApp) {
         app = webApp;
         Auth();
@@ -134,15 +134,21 @@ internal static class RouteManager {
         app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
             var login = loginRequest.Login;
             var password = loginRequest.Password;
-
             var user = await repository.FindByLoginAsync(login);
-            if (user == null || user.Password != password) {
-                string err = $"User {user} wasn't found or password is incorrect";
+            string err;
+
+            if (user == null) {
+                err = $"User {login} wasn't found";
                 logger.LogDebug(err);
-                Results.BadRequest(err);
+                return Results.BadRequest(err);
+            }
+            if (!HashHelper.Verify(password, user.Password.Hash)) {
+                err = $"User {login} password is wrong";
+                return Results.BadRequest(err);
             }
 
-            return TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions);
+            return Results.Json(
+                    TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions));
         });
 
         app.MapGet("/auth/refresh", async (IUserRepository repository, HttpContext context) => {

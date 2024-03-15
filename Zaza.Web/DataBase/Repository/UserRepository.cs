@@ -1,4 +1,5 @@
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+
 using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.DataBase.Repository;
@@ -7,19 +8,20 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     public async Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login) &
-            Builders<UserEntity>.Filter.Eq(u => u.Password, oldPassword);
-        var update = Builders<UserEntity>.Update.Set(u => u.Password, newPassword);
+            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, oldPassword);
+        var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, newPassword);
 
         var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
         if (result == null) {
             logger.LogDebug($"User: {login} isn't exist or password is wrong");
             return false;
         }
+
         return true;
     }
 
     public async Task<bool> AddAsync(UserMainDTO user) {
-        var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login, user.Password, Stuff.TokenService.GenerateRefreshToken(180));
+        var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login, new Password(user.Password), Stuff.TokenService.GenerateRefreshToken(180));
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
         if (exists.Any()) {
@@ -69,7 +71,7 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     public async Task<UserEntity?> FindAsync(UserMainDTO dto) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, dto.Login) &
-            Builders<UserEntity>.Filter.Eq(u => u.Password, dto.Password);
+            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, dto.Password);
         var res = await mongo.Users.FindAsync(filter);
         return res.First();
 
