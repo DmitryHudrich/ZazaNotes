@@ -5,7 +5,7 @@ using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web;
 
-internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserRepository userRepository, MongoService mongo) : INoteRepository {
+internal sealed class NoteRepository(IUserRepository userRepository, MongoService mongo) : INoteRepository {
     public async Task<bool> AddNoteAsync(string login, string title, string text) {
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, login);
         var update = Builders<UserEntity>.Update.Push(u => u.Notes, new NoteEntity(Guid.NewGuid(), title, text));
@@ -31,24 +31,20 @@ internal sealed class NoteRepository(ILogger<NoteRepository> logger, IUserReposi
     }
 
     public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote, string login) {
-        // Фильтр для нахождения пользователя по логину и заметки по GUID
         var filter = Builders<UserEntity>.Filter.And(
             Builders<UserEntity>.Filter.Eq(u => u.Login, login),
             Builders<UserEntity>.Filter.ElemMatch(u => u.Notes, Builders<NoteEntity>.Filter.Eq(n => n.Id, newNote.Guid))
         );
 
-        // Обновление для изменения заголовка и текста заметки
         var update = Builders<UserEntity>.Update.Set("Notes.$", new NoteEntity(newNote.Guid, newNote.Title, newNote.Text));
 
-        // Выполняем запрос к базе данных MongoDB
         var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
 
-        // Возвращаем результат операции
         return result != null;
     }
 
     private async Task<UserEntity?> GetUserAsync(string login) {
-        var res = userRepository.FindByLoginAsync(login).Result;
+        var res = await userRepository.FindByLoginAsync(login);
         return res;
     }
 }
