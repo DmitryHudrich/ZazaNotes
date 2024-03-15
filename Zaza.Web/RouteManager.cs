@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authorization;
+
 using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff;
@@ -11,19 +13,6 @@ namespace Zaza.Web;
 internal static class RoutingHelper {
     public static string GetName(this HttpContext context) => context.User.FindFirstValue(ClaimTypes.Name) ?? throw new ArgumentNullException(nameof(GetName));
 }
-
-/* TODO:
- * users crud:
- * + create (registration)
- * + get 
- * + update
- * + delete
- * notes crud:
- * + get all notes
- * + make note
- * + change
- * + delete
- */
 
 internal static class RouteManager {
     private static IEndpointRouteBuilder app = WebApplication.Create();
