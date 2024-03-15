@@ -1,8 +1,7 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Zaza.Web;
+namespace Zaza.Web.Stuff;
 
 internal static class StaticStuff {
     static readonly public CookieOptions SecureCookieOptions = new CookieOptions {
@@ -22,7 +21,6 @@ internal static class StaticStuff {
             ValidateIssuerSigningKey = true,
         };
     };
-
 }
 
 

@@ -1,7 +1,8 @@
-using System.Text;
+﻿using System.Text;
+
 using Microsoft.IdentityModel.Tokens;
 
-namespace Zaza.Web;
+namespace Zaza.Web.Stuff;
 
 internal static class AuthOptions {
     public const string ISSUER = "BebraProvider";

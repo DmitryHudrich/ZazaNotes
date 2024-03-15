@@ -2,6 +2,7 @@
 
 using Zaza.Web;
 using Zaza.Web.DataBase.Repository;
+using Zaza.Web.Stuff;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -26,8 +27,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors(options =>
-{
+app.UseCors(options => {
     options.AllowAnyHeader();
     options.AllowAnyMethod();
     options.AllowAnyOrigin();
@@ -35,8 +35,7 @@ app.UseCors(options =>
 app.UseAuthentication();   // добавление middleware аутентификации 
 app.UseAuthorization();   // добавление middleware авторизации 
 
-app.Use(async (context, next) =>
-{
+app.Use(async (context, next) => {
     var httpContext = context.Request.HttpContext;
     var logger = httpContext.RequestServices.GetRequiredService<ILogger<WebApplication>>();
 
@@ -50,16 +49,13 @@ RouteManager.SetEndpoints(app);
 
 app.Run();
 
-LogLevel LoadLogLevel()
-{
+LogLevel LoadLogLevel() {
     var level = builder.Configuration["Logging:LogLevel:Default"];
-    if (level == null)
-    {
+    if (level == null) {
         throw new Exception("Value in <Logging -> LogLevel -> Default> not found");
     }
     System.Console.WriteLine("LogLevel: " + level);
-    switch (level)
-    {
+    switch (level) {
         case "Trace":
             return LogLevel.Trace;
         case "Debug":
