@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/Zaza.Web.csproj": {}
+    "C:\\Users\\Andruha\\Source\\Repos\\ZazaNotes\\Zaza.Web\\Zaza.Web.csproj": {}
   },
   "projects": {
-    "/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/Zaza.Web.csproj": {
+    "C:\\Users\\Andruha\\Source\\Repos\\ZazaNotes\\Zaza.Web\\Zaza.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/Zaza.Web.csproj",
+        "projectUniqueName": "C:\\Users\\Andruha\\Source\\Repos\\ZazaNotes\\Zaza.Web\\Zaza.Web.csproj",
         "projectName": "Zaza.Web",
-        "projectPath": "/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/Zaza.Web.csproj",
-        "packagesPath": "/home/hudric/.nuget/packages/",
-        "outputPath": "/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/",
+        "projectPath": "C:\\Users\\Andruha\\Source\\Repos\\ZazaNotes\\Zaza.Web\\Zaza.Web.csproj",
+        "packagesPath": "C:\\Users\\Andruha\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Andruha\\Source\\Repos\\ZazaNotes\\Zaza.Web\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/hudric/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Andruha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,24 +39,6 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "dependencies": {
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[8.0.2, )"
-            },
-            "Microsoft.AspNetCore.OpenApi": {
-              "target": "Package",
-              "version": "[8.0.2, )"
-            },
-            "MongoDB.Driver": {
-              "target": "Package",
-              "version": "[2.24.0, )"
-            },
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[6.4.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -66,21 +50,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.2, 8.0.2]"
-            }
-          ],
-          "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }
