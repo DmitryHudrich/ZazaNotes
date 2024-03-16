@@ -11,9 +11,9 @@ using System;
 using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zaza.Web")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("DEBUG")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e45f9b8c50d13c3681affd6a70f1defcd008b11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+792b4c9aeb42e2840141459ed913a020a5991822")]
 [assembly: System.Reflection.AssemblyProductAttribute("Zaza.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Zaza.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
