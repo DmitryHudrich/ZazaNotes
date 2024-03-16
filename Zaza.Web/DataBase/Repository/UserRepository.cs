@@ -83,14 +83,6 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
         return res;
     }
 
-    public async Task<UserEntity?> FindAsync(UserMainDTO dto) {
-        var filter =
-            Builders<UserEntity>.Filter.Eq(u => u.Login, dto.Login) &
-            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, dto.Password);
-        var res = await mongo.Users.FindAsync(filter);
-        return res.First();
-
-    }
     public async Task<UserEntity?> FindByLoginAsync(string login) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login);

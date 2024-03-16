@@ -23,7 +23,6 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -74,9 +73,3 @@ LogLevel LoadLogLevel() {
             throw new ArgumentException("Unknown log level was set in configuration");
     }
 }
-
-/*
- * TODO:
- * 1. Нормальные логи сделать
- * 2. бдшку подрубить
- */
