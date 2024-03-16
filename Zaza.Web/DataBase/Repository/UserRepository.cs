@@ -21,7 +21,8 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     }
 
     public async Task<bool> AddAsync(UserMainDTO user) {
-        var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login, new Password(user.Password), Stuff.TokenService.GenerateRefreshToken(180));
+        var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login,
+                new Password(user.Password), Stuff.TokenService.GenerateRefreshToken(180));
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
         if (exists.Any()) {
@@ -66,7 +67,21 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
         }
     }
 
-    // TODO: rewrite to Find(filter);
+    public async Task<UserEntity?> FindByFilterAsync(FindFilter filter, string findRequest) {
+        UserEntity? res;
+        switch (filter) {
+            case FindFilter.REFRESH:
+                res = await FindByRefreshAsync(findRequest);
+                break;
+            case FindFilter.LOGIN:
+                res = await FindByLoginAsync(findRequest);
+                break;
+            default:
+                res = default;
+                break;
+        }
+        return res;
+    }
 
     public async Task<UserEntity?> FindAsync(UserMainDTO dto) {
         var filter =
@@ -89,3 +104,9 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
         return res.First();
     }
 }
+
+internal enum FindFilter {
+    LOGIN,
+    REFRESH,
+}
+

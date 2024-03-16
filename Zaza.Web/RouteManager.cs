@@ -108,7 +108,6 @@ internal static class RouteManager {
     }
 
     private static void Auth() {
-        //  TODO: смену пароля сделать
         app.MapPost("/auth/password", [Authorize]
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             if (!await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)) {
