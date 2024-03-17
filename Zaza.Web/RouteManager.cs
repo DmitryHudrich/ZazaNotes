@@ -68,7 +68,7 @@ internal static class RouteManager {
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
             var user = await repository.FindByLoginAsync(context.GetName());
             if (user == null) {
-                string err = $"User {context.GetName()} isn't found in db.";
+                string err = $"User {context.GetName()} wasn't found in db.";
                 logger.LogDebug(new UserNotFoundException(nameof(user)), err);
                 return Results.BadRequest(err);
             }
@@ -81,7 +81,7 @@ internal static class RouteManager {
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
             var userStatus = await repository.DeleteByLoginAsync(context.GetName());
             if (!userStatus) {
-                string err = $"User {context.GetName()} wasn't found or his don't have notes";
+                string err = $"User {context.GetName()} wasn't found or user doesn't have notes";
                 logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
                 return Results.BadRequest(err);
             }
@@ -111,14 +111,14 @@ internal static class RouteManager {
         app.MapPost("/auth/password", [Authorize]
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             if (!await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)) {
-                return Results.BadRequest(""); // TODO: дописать ошибку
+                return Results.BadRequest($"User: {context.GetName()} is not found or password is wrong"); 
             }
             return Results.Ok();
         });
 
         app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
-                string err = $"{user.Login}: account don't create, because password must contain more then zero symbols lol ";
+                string err = $"{user.Login}: account didn't create, because password must contain more than zero symbols lol ";
                 logger.LogDebug(new ArgumentException(nameof(user.Password)), err);
                 return Results.BadRequest(err);
             }
