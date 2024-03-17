@@ -14,9 +14,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(StaticStuff.JwtBearerOptions);
 
 builder.Services.AddLogging(conf => conf.SetMinimumLevel(LoadLogLevel()));
-
 builder.Services.AddScoped<MongoService>();
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddCors();
@@ -31,8 +29,8 @@ app.UseCors(options => {
     options.AllowAnyMethod();
     options.AllowAnyOrigin();
 });
-app.UseAuthentication();   // добавление middleware аутентификации 
-app.UseAuthorization();   // добавление middleware авторизации 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Use(async (context, next) => {
     var httpContext = context.Request.HttpContext;
