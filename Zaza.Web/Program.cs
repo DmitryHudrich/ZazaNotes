@@ -7,6 +7,11 @@ using Zaza.Web.Stuff;
 ArgumentManager.Check();
 
 var builder = WebApplication.CreateBuilder(args);
+var tokExp = builder.Configuration["Jwt:Expiry"];
+if (tokExp == null) {
+    tokExp = "2";
+}
+StaticStuff.JwtExpire = double.Parse(tokExp);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

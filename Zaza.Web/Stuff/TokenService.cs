@@ -24,11 +24,12 @@ internal static class TokenService {
 
         var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+        logger.LogDebug("Jwt token expiry: " + StaticStuff.JwtExpire);
         var jwt = new JwtSecurityToken(
             issuer: AuthOptions.ISSUER,
             audience: AuthOptions.AUDIENCE,
             claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(StaticStuff.JwtExpire)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                 SecurityAlgorithms.HmacSha256));
 

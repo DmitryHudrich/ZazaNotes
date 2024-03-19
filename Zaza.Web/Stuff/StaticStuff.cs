@@ -24,6 +24,8 @@ internal static class StaticStuff {
             ValidateIssuerSigningKey = true,
         };
     };
+
+    static public double JwtExpire;
 }
 
 
