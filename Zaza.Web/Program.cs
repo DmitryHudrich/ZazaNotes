@@ -4,6 +4,8 @@ using Zaza.Web;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff;
 
+ArgumentManager.Check();
+
 var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddEndpointsApiExplorer();

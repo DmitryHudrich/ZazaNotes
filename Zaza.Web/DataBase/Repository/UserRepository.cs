@@ -89,6 +89,7 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
         var res = await mongo.Users.FindAsync(filter);
         return res.First();
     }
+
     public async Task<UserEntity?> FindByRefreshAsync(string refreshToken) {
         var filer =
             Builders<UserEntity>.Filter.Eq(u => u.RefreshToken.Data, refreshToken);
