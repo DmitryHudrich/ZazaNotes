@@ -21,6 +21,10 @@ internal static class ArgumentManager {
             Values = new Dictionary<string, Action<string>> {
                 { @"^mongodb://\w*", (string value) => System.Console.WriteLine("BEBRA") },
             },
+        },
+        new Arg {
+            Flag = "--swagger",
+            IfFound = () => State.UseSwagger = true,
         }
     ];
 
@@ -33,10 +37,14 @@ internal static class ArgumentManager {
     private static void Exec(Arg arg) {
         if (cliArgs.Contains(arg.Flag)) {
             var argIndex = Array.FindIndex(cliArgs, 0, el => el == arg.Flag);
-            foreach (var pairs in arg.Values) {
-                if (Regex.IsMatch(cliArgs[argIndex + 1], pairs.Key)) {
-                    pairs.Value?.Invoke(cliArgs[argIndex + 1]);
-
+            if (arg.IfFound != null) {
+                arg.IfFound?.Invoke();
+            }
+            if (arg.Values != null) {
+                foreach (var pairs in arg.Values) {
+                    if (Regex.IsMatch(cliArgs[argIndex + 1], pairs.Key)) {
+                        pairs.Value?.Invoke(cliArgs[argIndex + 1]);
+                    }
                 }
             }
         }
@@ -45,5 +53,6 @@ internal static class ArgumentManager {
 
 internal class Arg {
     public required string Flag;
-    public required Dictionary<string, Action<string>> Values;
+    public Dictionary<string, Action<string>>? Values;
+    public Action? IfFound;
 }

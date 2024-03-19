@@ -6,8 +6,7 @@ using Zaza.Web.Stuff;
 
 ArgumentManager.Check();
 
-var builder = WebApplication.CreateBuilder();
-
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -23,8 +22,11 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (State.UseSwagger) {
+    app.Logger.LogInformation("Enabling swagger");
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseCors(options => {
     options.AllowAnyHeader();
@@ -33,7 +35,6 @@ app.UseCors(options => {
 });
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.Use(async (context, next) => {
     var httpContext = context.Request.HttpContext;
     var logger = httpContext.RequestServices.GetRequiredService<ILogger<WebApplication>>();
@@ -45,7 +46,6 @@ app.Use(async (context, next) => {
 });
 
 RouteManager.SetEndpoints(app);
-
 app.Run();
 
 LogLevel LoadLogLevel() {
