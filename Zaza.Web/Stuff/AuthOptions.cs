@@ -9,8 +9,6 @@ internal static class AuthOptions {
     public const string AUDIENCE = "ZazaConsumer";
     private const string KEY = "mysupersecret_secretsecretsecretkey!123";
 
-    public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
-        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
+    public static SymmetricSecurityKey GetSymmetricSecurityKey()
+        => new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
 }
-
-

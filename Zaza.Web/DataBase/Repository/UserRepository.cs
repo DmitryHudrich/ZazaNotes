@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using Zaza.Web.DataBase.Entities;
+using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.DataBase.Repository;

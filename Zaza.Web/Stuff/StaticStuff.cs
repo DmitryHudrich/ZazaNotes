@@ -4,15 +4,15 @@ using Microsoft.IdentityModel.Tokens;
 namespace Zaza.Web.Stuff;
 
 internal static class StaticStuff {
-    static readonly public string MongoStingEnvName = "MONGO_URI";
-    static readonly public string MongoStingDefault = "mongodb://localhost:27017";
+    public static readonly string MongoStingEnvName = "MONGO_URI";
+    public static readonly string MongoStingDefault = "mongodb://localhost:27017";
 
-    static readonly public CookieOptions SecureCookieOptions = new CookieOptions {
+    public static readonly CookieOptions SecureCookieOptions = new CookieOptions {
         HttpOnly = true,
         SameSite = SameSiteMode.Strict
     };
 
-    static readonly public Action<JwtBearerOptions> JwtBearerOptions = options => {
+    public static readonly Action<JwtBearerOptions> JwtBearerOptions = options => {
         options.TokenValidationParameters = new TokenValidationParameters {
             ClockSkew = TimeSpan.Zero,
             ValidateIssuer = true,
@@ -25,7 +25,5 @@ internal static class StaticStuff {
         };
     };
 
-    static public double JwtExpire;
+    public static double JwtExpire;
 }
-
-

@@ -19,7 +19,7 @@ internal static class ArgumentManager {
         new Arg {
             Flag = "--test",
             Values = new Dictionary<string, Action<string>> {
-                { @"^mongodb://\w*", (string value) => System.Console.WriteLine("BEBRA") },
+                { @"^mongodb://\w*", (string value) => Console.WriteLine("BEBRA") },
             },
         },
         new Arg {
