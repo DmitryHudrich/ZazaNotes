@@ -25,4 +25,4 @@
 	- Enable daemon: `systemctl enable docker.socket && systemctl start docker.socket`
 - Deploy: `$ wget https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml -O docker-compose.yml && docker compose up -d --build`
 
-
+add --h flag for help
