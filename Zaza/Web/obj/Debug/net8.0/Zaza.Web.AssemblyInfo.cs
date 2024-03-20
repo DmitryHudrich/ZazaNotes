@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zaza.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+830449afbe84ef966c47882996a742549e42ce18")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0154d0c88343033f894cea626221368ae2717884")]
 [assembly: System.Reflection.AssemblyProductAttribute("Zaza.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Zaza.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
