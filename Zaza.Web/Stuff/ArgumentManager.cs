@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Zaza.Web.Stuff;
 
@@ -25,6 +26,20 @@ internal static class ArgumentManager {
         new Arg {
             Flag = "--swagger",
             IfFound = () => State.UseSwagger = true,
+        },
+        new Arg {
+            Flag = "--health-check",
+            IfFound = () => {
+                var p = new Process {
+                    StartInfo = {
+                        FileName = "dotnet",
+                        WorkingDirectory = "../Zaza.Web.Tests/",
+                        Arguments = "test",
+                    }};
+                _ = p.Start();
+                while (!p.HasExited);
+            }
+,
         }
     ];
 
