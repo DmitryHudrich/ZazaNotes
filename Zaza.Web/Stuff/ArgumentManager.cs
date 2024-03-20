@@ -3,9 +3,9 @@
 namespace Zaza.Web.Stuff;
 
 internal static class ArgumentManager {
-    private static string[] cliArgs = Environment.GetCommandLineArgs();
+    private static readonly string[] cliArgs = Environment.GetCommandLineArgs();
 
-    private static Arg[] availableArgs = [
+    private static readonly Arg[] availableArgs = [
         new Arg {
             Flag = "--mongo",
             Values = new Dictionary<string, Action<string>> {

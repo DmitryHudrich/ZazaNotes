@@ -7,7 +7,7 @@ namespace Zaza.Web.Stuff;
 internal static class AuthOptions {
     public const string ISSUER = "BebraProvider";
     public const string AUDIENCE = "ZazaConsumer";
-    const string KEY = "mysupersecret_secretsecretsecretkey!123";
+    private const string KEY = "mysupersecret_secretsecretsecretkey!123";
 
     public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
