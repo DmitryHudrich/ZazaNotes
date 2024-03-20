@@ -1,4 +1,4 @@
-namespace Zaza.Web.Tests;
+﻿namespace Zaza.Web.Tests;
 
 public class Tests {
     [SetUp]
@@ -7,6 +7,6 @@ public class Tests {
 
     [Test]
     public void Test1() {
-        Assert.That(1 == 1);
+        Assert.That(1 == 2);
     }
 }

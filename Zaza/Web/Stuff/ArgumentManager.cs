@@ -27,21 +27,7 @@ internal static class ArgumentManager {
             Flag = "--swagger",
             IfFound = () => State.UseSwagger = true,
         },
-        new Arg {
-            Flag = "--health-check",
-            IfFound = () => {
-                var p = new Process {
-                    StartInfo = {
-                        FileName = "dotnet",
-                        WorkingDirectory = "../Zaza.Web.Tests/",
-                        Arguments = "test",
-                    }};
-                _ = p.Start();
-                while (!p.HasExited);
-            }
-,
-        }
-    ];
+    ]
 
     public static void Check() {
         foreach (var arg in availableArgs) {
