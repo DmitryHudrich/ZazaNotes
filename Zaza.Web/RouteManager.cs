@@ -24,7 +24,7 @@ internal static class RouteManager {
     }
 
     private static void Notes() {
-        app.MapPost("/user/note", [Authorize]
+        app.MapPost("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
             var res = Results.Ok();
             var username = context.GetName();
