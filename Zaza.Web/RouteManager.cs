@@ -24,7 +24,7 @@ internal static class RouteManager {
     }
 
     private static void Notes() {
-        app.MapPost("/user/notes", [Authorize]
+        app.MapPost("/user/note", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
             var res = Results.Ok();
             var username = context.GetName();
@@ -111,7 +111,7 @@ internal static class RouteManager {
         app.MapPost("/auth/password", [Authorize]
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             if (!await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)) {
-                return Results.BadRequest($"User: {context.GetName()} is not found or password is wrong"); 
+                return Results.BadRequest($"User: {context.GetName()} is not found or password is wrong");
             }
             return Results.Ok();
         });
