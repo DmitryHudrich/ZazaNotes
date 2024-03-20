@@ -1,9 +1,8 @@
 ﻿using MongoDB.Driver;
-using Zaza.Web.DataBase;
-using Zaza.Web.DataBase.Repository;
+using Zaza.Web.DataBase.Entities;
 using Zaza.Web.Stuff.DTO.Request;
 
-namespace Zaza.Web;
+namespace Zaza.Web.DataBase.Repository;
 
 internal sealed class NoteRepository(IUserRepository userRepository, MongoService mongo) : INoteRepository {
     public async Task<bool> AddNoteAsync(string login, string title, string text) {
@@ -16,10 +15,7 @@ internal sealed class NoteRepository(IUserRepository userRepository, MongoServic
 
     public async Task<List<NoteEntity>> GetNotesAsync(string login) {
         var user = await GetUserAsync(login);
-        if (user == null) {
-            return [];
-        }
-        return user.Notes;
+        return user == null ? [] : user.Notes;
     }
 
     public async Task<bool> DeleteNoteAsync(Guid id) {

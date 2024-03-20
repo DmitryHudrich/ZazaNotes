@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-
+using Zaza.Web.DataBase.Entities;
 using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.DataBase.Repository;
@@ -25,6 +25,7 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
                 new Password(user.Password), Stuff.TokenService.GenerateRefreshToken(180));
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
+
         if (exists.Any()) {
             logger.LogDebug($"User: {user.Login} already exists");
             return false;
