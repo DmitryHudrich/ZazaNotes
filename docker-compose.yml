@@ -2,7 +2,7 @@ version: '3'
 
 services:
   server:
-    build: https://github.com/DmitryHudrich/ZazaNotes.git#:Zaza/Web
+    build: https://github.com/DmitryHudrich/ZazaNotes.git#:Zaza/Web/
     ports:
       - "5000:8080"
     environment:
