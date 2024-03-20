@@ -8,6 +8,7 @@ using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.DTO.Response;
+using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web;
 
@@ -115,6 +116,22 @@ internal static class RouteManager {
             return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
                 ? Results.BadRequest($"User: {context.GetName()} is not found or password is wrong")
                 : Results.Ok();
+        });
+
+        _ = app.MapPost("/auth/telegram", [Authorize]
+        async (IUserRepository repository, HttpContext context, long id) => {
+            var user = await repository.FindByLoginAsync(context.GetName());
+            if (user == null) {
+                return Results.BadRequest($"User: {context.GetName()} is not found");
+            }
+            await repository.ChangeTelegramId(context.GetName(), id);
+            return Results.Ok();
+        });
+
+        _ = app.MapGet("/auth/telegram", [Authorize]
+        async (IUserRepository repository, HttpContext context) => {
+            var user = await repository.FindByLoginAsync(context.GetName());
+            return user == null ? Results.BadRequest($"User: {context.GetName()} is not found") : Results.Json(user.TelegramId);
         });
 
         _ = app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {

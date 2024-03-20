@@ -1,9 +1,9 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web.DataBase.Entities;
 
-internal record class UserEntity(Guid Id, UserInfo Info, string Login, Password Password, RefreshToken RefreshToken) {
-    public static UserEntity Empty { get; } = new UserEntity(Guid.Empty, new UserInfo(""), "", new Password(""), new RefreshToken("", TimeSpan.Zero));
+internal record class UserEntity(Guid Id, UserInfo Info, string Login, Password Password, long TelegramId, RefreshToken RefreshToken) {
+    public static UserEntity Empty { get; } = new UserEntity(Guid.Empty, new UserInfo(""), "", new Password(""), 0, new RefreshToken("", TimeSpan.Zero));
     public DateTime Registration { get; init; } = DateTime.Now;
     public List<NoteEntity> Notes { get; set; } = [];
 }
