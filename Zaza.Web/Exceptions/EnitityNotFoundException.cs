@@ -1,6 +1,4 @@
-﻿namespace Zaza.Web;
+﻿namespace Zaza.Web.Exceptions;
 
-internal class EnitityNotFoundException : Exception {
-    public EnitityNotFoundException(string? message) : base(message) {
-    }
+internal class EnitityNotFoundException(string? message) : Exception(message) {
 }

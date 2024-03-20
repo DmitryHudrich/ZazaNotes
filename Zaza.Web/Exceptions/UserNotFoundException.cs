@@ -1,6 +1,4 @@
-﻿namespace Zaza.Web;
+﻿namespace Zaza.Web.Exceptions;
 
-public class UserNotFoundException : Exception {
-    public UserNotFoundException(string? message) : base(message) {
-    }
+public class UserNotFoundException(string? message) : Exception(message) {
 }
