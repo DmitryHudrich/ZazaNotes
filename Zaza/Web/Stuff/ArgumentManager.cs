@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Zaza.Web.Stuff;
 
@@ -9,6 +8,7 @@ internal static class ArgumentManager {
     private static readonly Arg[] availableArgs = [
         new Arg {
             Flag = "--mongo",
+            Decription = "MongoDb connection string. May be 'default' or 'exist' or 'mongodb://<host>:<port>'",
             Values = new Dictionary<string, Action<string>> {
                 { "default", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, StaticStuff.MongoStingDefault) },
                 { "exist", (string _) => { if (Environment.GetEnvironmentVariable(StaticStuff.MongoStingEnvName) == null) {
@@ -19,14 +19,30 @@ internal static class ArgumentManager {
         },
         new Arg {
             Flag = "--test",
+            Decription = "bebra",
             Values = new Dictionary<string, Action<string>> {
-                { @"^mongodb://\w*", (string value) => Console.WriteLine("BEBRA") },
+                { "bebra", (string value) => Console.WriteLine("BEBRA") },
             },
         },
         new Arg {
             Flag = "--swagger",
+            Decription = "Should swagger ui be shown",
             IfFound = () => State.UseSwagger = true,
         },
+        new Arg {
+            Flag = "--h",
+            Decription = "Show this help and exit",
+            IfFound = () => {
+                Console.WriteLine("Usage: dotnet Zaza.Web.dll [FLAG] [FLAG OPTIONS] ");
+                Console.WriteLine("Example: dotnet Zaza.Web.dll --mongo default --swagger");
+                Console.WriteLine();
+                foreach (var arg in availableArgs!) {
+                    Console.WriteLine($"{arg.Flag} - {arg.Decription}");
+                }
+                Environment.Exit(0);
+            }
+        }
+
     ];
 
     public static void Check() {
@@ -54,6 +70,7 @@ internal static class ArgumentManager {
 
 internal class Arg {
     public required string Flag;
+    public string? Decription;
     public Dictionary<string, Action<string>>? Values;
     public Action? IfFound;
 }
