@@ -12,31 +12,17 @@ internal record class NoteEntity(Guid Id, string Title = "", string Text = "") {
     public DateTime LastChange { get; init; } = DateTime.Now;
 };
 
-internal class Password {
-    [BsonElement]
-    private string hash;
-
-    public string Hash => hash;
-
-    public Password(string password) {
-        hash = HashHelper.Hash(password);
-    }
+internal class Password(string password) {
+    public string Hash { get; set; } = HashHelper.Hash(password);
 
     public override bool Equals(object? obj) {
-        if (obj is not Password password) {
-            return false;
-        }
-
-        if (!HashHelper.Verify(password.Hash, hash)) {
-            return false;
-        }
-        return true;
+        return obj is Password password && HashHelper.Verify(password.Hash, Hash);
     }
 
-    public override int GetHashCode() => hash.GetHashCode();
+    public override int GetHashCode() => Hash.GetHashCode();
 }
 
 internal record class UserInfo(
-        string FirstName, string LastName = "", string Description = "", string Country = "", string photo = "");
+        string FirstName, string LastName = "", string Description = "", string Country = "", string Photo = "");
 
-internal record class RefreshToken(string Data, TimeSpan expire);
+internal record class RefreshToken(string Data, TimeSpan Expire);

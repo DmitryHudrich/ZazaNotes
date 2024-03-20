@@ -25,7 +25,7 @@ builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddCors();
 
 var app = builder.Build();
-
+app.Logger.LogInformation("MongoString: " + Environment.GetEnvironmentVariable(StaticStuff.MongoStingEnvName));
 if (State.UseSwagger) {
     app.Logger.LogInformation("Enabling swagger");
     _ = app.UseSwagger();

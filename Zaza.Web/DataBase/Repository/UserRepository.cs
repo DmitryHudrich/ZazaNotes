@@ -9,8 +9,8 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     public async Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login) &
-            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, oldPassword);
-        var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, newPassword);
+            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, HashHelper.Hash(oldPassword));
+        var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, HashHelper.Hash(newPassword));
 
         var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
         if (result == null) {
