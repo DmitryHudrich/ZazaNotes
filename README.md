@@ -3,7 +3,7 @@
 
 ## Easy way to deploy on windows with docker
 
-- Install docker: `https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe?utm_source=docker&utm_medium=webreferral&utm_campaign=dd-smartbutton&utm_location=module`
+- Install docker: https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe?utm_source=docker&utm_medium=webreferral&utm_campaign=dd-smartbutton&utm_location=module
 - Run docker as an administrator
 - Run cmd as administrator: `curl -o docker-compose.yml https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml && docker compose up -d --build`
 ##  Windows without docker
