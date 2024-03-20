@@ -14,7 +14,7 @@
 ### 3. Run docker desktop as administrator
 ### 4. Deploy!
 - Run cmd as administrator
-- Enter: `wget https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml && docker compose up -d`
+- Enter: `wget https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml -O docker-compose.yml && docker compose up -d`
 ##  Windows without docker
 ### 1. Download repo:
 -  **_With git:_** `git clone https://github.com/DmitryHudrich/ZazaNotes.git`
@@ -32,6 +32,6 @@
 - Install docker: 
 	- Install package: `sudo pacman -S docker-compose`
 	- Enable daemon: `systemctl enable docker.socket && systemctl start docker.socket`
-- Deploy: `$ wget https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml && docker compose up -d`
+- Deploy: `$ wget https://raw.githubusercontent.com/DmitryHudrich/ZazaNotes/main/Zaza.Web/docker-compose.yml -O docker-compose.yml && docker compose up -d`
 
 
