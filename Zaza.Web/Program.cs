@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using Zaza.Web;
+using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Stuff;
 
 ArgumentManager.Check();
 
 var builder = WebApplication.CreateBuilder(args);
-var tokExp = builder.Configuration["Jwt:Expiry"];
-if (tokExp == null) {
-    tokExp = "2";
-}
+var tokExp = builder.Configuration["Jwt:Expiry"] ?? "2";
 StaticStuff.JwtExpire = double.Parse(tokExp);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -18,7 +16,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(StaticStuff.JwtBearerOptions);
-
 
 builder.Services.AddLogging(conf => conf.SetMinimumLevel(LoadLogLevel()));
 builder.Services.AddScoped<MongoService>();
@@ -30,14 +27,14 @@ var app = builder.Build();
 
 if (State.UseSwagger) {
     app.Logger.LogInformation("Enabling swagger");
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    _ = app.UseSwagger();
+    _ = app.UseSwaggerUI();
 }
 
 app.UseCors(options => {
-    options.AllowAnyHeader();
-    options.AllowAnyMethod();
-    options.AllowAnyOrigin();
+    _ = options.AllowAnyHeader();
+    _ = options.AllowAnyMethod();
+    _ = options.AllowAnyOrigin();
 });
 app.UseAuthentication();
 app.UseAuthorization();
@@ -55,27 +52,17 @@ RouteManager.SetEndpoints(app);
 app.Run();
 
 LogLevel LoadLogLevel() {
-    var level = builder.Configuration["Logging:LogLevel:Default"];
-    if (level == null) {
-        throw new Exception("Value in <Logging -> LogLevel -> Default> not found");
-    }
-    System.Console.WriteLine("LogLevel: " + level);
-    switch (level) {
-        case "Trace":
-            return LogLevel.Trace;
-        case "Debug":
-            return LogLevel.Debug;
-        case "Information":
-            return LogLevel.Information;
-        case "Warning":
-            return LogLevel.Warning;
-        case "Error":
-            return LogLevel.Error;
-        case "Critical":
-            return LogLevel.Critical;
-        case "None":
-            return LogLevel.None;
-        default:
-            throw new ArgumentException("Unknown log level was set in configuration");
-    }
+    var level = builder.Configuration["Logging:LogLevel:Default"] ??
+        throw new ArgumentException("Value in <Logging -> LogLevel -> Default> not found");
+    Console.WriteLine("LogLevel: " + level);
+    return level switch {
+        "Trace" => LogLevel.Trace,
+        "Debug" => LogLevel.Debug,
+        "Information" => LogLevel.Information,
+        "Warning" => LogLevel.Warning,
+        "Error" => LogLevel.Error,
+        "Critical" => LogLevel.Critical,
+        "None" => LogLevel.None,
+        _ => throw new ArgumentException("Unknown log level was set in configuration"),
+    };
 }

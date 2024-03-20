@@ -4,8 +4,7 @@ using System.Security.Cryptography;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
-using Zaza.Web.DataBase;
+using Zaza.Web.DataBase.Entities;
 using Zaza.Web.DataBase.Repository;
 
 namespace Zaza.Web.Stuff;

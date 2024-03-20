@@ -1,4 +1,4 @@
-﻿using Zaza.Web.DataBase;
+﻿using Zaza.Web.DataBase.Entities;
 
 namespace Zaza.Web.Stuff.DTO.Request;
 

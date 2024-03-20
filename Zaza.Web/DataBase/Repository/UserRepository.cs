@@ -69,18 +69,11 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     }
 
     public async Task<UserEntity?> FindByFilterAsync(FindFilter filter, string findRequest) {
-        UserEntity? res;
-        switch (filter) {
-            case FindFilter.REFRESH:
-                res = await FindByRefreshAsync(findRequest);
-                break;
-            case FindFilter.LOGIN:
-                res = await FindByLoginAsync(findRequest);
-                break;
-            default:
-                res = default;
-                break;
-        }
+        var res = filter switch {
+            FindFilter.REFRESH => await FindByRefreshAsync(findRequest),
+            FindFilter.LOGIN => await FindByLoginAsync(findRequest),
+            _ => default,
+        };
         return res;
     }
 

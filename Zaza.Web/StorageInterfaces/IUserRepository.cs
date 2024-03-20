@@ -1,4 +1,5 @@
-﻿using Zaza.Web.Stuff.DTO.Request;
+﻿using Zaza.Web.DataBase.Entities;
+using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.DataBase.Repository;
 
