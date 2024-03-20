@@ -1,7 +1,7 @@
 ﻿using Zaza.Web.DataBase.Entities;
 using Zaza.Web.Stuff.DTO.Request;
 
-namespace Zaza.Web.DataBase.Repository;
+namespace Zaza.Web.StorageInterfaces;
 
 internal interface IUserRepository {
     Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword);

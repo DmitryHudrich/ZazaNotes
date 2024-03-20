@@ -1,7 +1,7 @@
 ﻿using Zaza.Web.DataBase.Entities;
 using Zaza.Web.Stuff.DTO.Request;
 
-namespace Zaza.Web;
+namespace Zaza.Web.StorageInterfaces;
 
 internal interface INoteRepository {
     Task<bool> AddNoteAsync(string login, string title, string text);
