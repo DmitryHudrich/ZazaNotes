@@ -27,7 +27,7 @@ internal static class ArgumentManager {
             Flag = "--swagger",
             IfFound = () => State.UseSwagger = true,
         },
-    ]
+    ];
 
     public static void Check() {
         foreach (var arg in availableArgs) {
