@@ -51,3 +51,5 @@
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.pdb
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.genruntimeconfig.cache
 /home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/ref/Zaza.Web.dll
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.AssemblyInfoInputs.cache
+/home/hudric/dotnet-projs/ZazaMVC/Zaza.Web/obj/Debug/net8.0/Zaza.Web.AssemblyInfo.cs

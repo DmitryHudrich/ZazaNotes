@@ -2,6 +2,7 @@
 using Zaza.Web.DataBase.Entities;
 using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff.DTO.Request;
+using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web.DataBase.Repository;
 
@@ -9,8 +10,8 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
     public async Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword) {
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login) &
-            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, oldPassword);
-        var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, newPassword);
+            Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, HashHelper.Hash(oldPassword));
+        var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, HashHelper.Hash(newPassword));
 
         var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
         if (result == null) {
@@ -23,7 +24,7 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
 
     public async Task<bool> AddAsync(UserMainDTO user) {
         var item = new UserEntity(Guid.NewGuid(), user.Info, user.Login,
-                new Password(user.Password), Stuff.TokenService.GenerateRefreshToken(180));
+            new Password(user.Password), user.TelegramId, Stuff.TokenService.GenerateRefreshToken(180));
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
 
@@ -41,6 +42,17 @@ internal class UserRepository(ILogger<UserRepository> logger, MongoService mongo
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, login);
         var deleteResult = await mongo.Users.DeleteOneAsync(filter);
         return deleteResult.DeletedCount > 0;
+    }
+
+    public async Task ChangeTelegramId(string login, long id) {
+        var filter =
+           Builders<UserEntity>.Filter.Eq(u => u.Login, login);
+        var update = Builders<UserEntity>.Update.Set(u => u.TelegramId, id);
+
+        var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
+        if (result == null) {
+            logger.LogDebug($"User: {login} isn't exist");
+        }
     }
 
     public async Task<bool> ChangeInfoAsync(string login, UserInfo newInfo) {
