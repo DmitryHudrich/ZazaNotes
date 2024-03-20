@@ -1,4 +1,4 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
-COPY ./bin/Release/net8.0/publish/ /app
+COPY . /app
 WORKDIR /app
-ENTRYPOINT ["dotnet", "Zaza.Web.dll", "--swagger", "--mongo exist"]
+ENTRYPOINT ["dotnet", "build"]
