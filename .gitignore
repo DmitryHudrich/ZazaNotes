@@ -1,4 +1,3 @@
-
-./Zaza.Web/obj/
-./Zaza.Web/bin/
+**/obj/
+**/bin/
 ./.vs/

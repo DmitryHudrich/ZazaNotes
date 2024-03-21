@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza.Web.Tests", "Tests\Zaza.Web.Tests.csproj", "{A5E85E22-F58B-4D57-9FD4-FB8DC73CEFBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza.Web", "Web\Zaza.Web.csproj", "{23F577EA-CF77-4B23-8C94-F183326972D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5E85E22-F58B-4D57-9FD4-FB8DC73CEFBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5E85E22-F58B-4D57-9FD4-FB8DC73CEFBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5E85E22-F58B-4D57-9FD4-FB8DC73CEFBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5E85E22-F58B-4D57-9FD4-FB8DC73CEFBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23F577EA-CF77-4B23-8C94-F183326972D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23F577EA-CF77-4B23-8C94-F183326972D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23F577EA-CF77-4B23-8C94-F183326972D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23F577EA-CF77-4B23-8C94-F183326972D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
