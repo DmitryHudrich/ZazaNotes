@@ -87,7 +87,7 @@ class User:
         return False
 
 
-    def get_user_info_by_telegram_id(self, tg_id: int, user_token: int):
+    def get_user_info_by_telegram_id(self, tg_id: int, user_token: int) -> bool:
         """
         Get user info by tg_id
         :param tg_id:
@@ -104,15 +104,6 @@ class User:
             },
         )
 
-        print(req.content)
-
-        return req
-
-obj_to_test = User()
-
-data_us = UserToken(
-    "thedarkfox98",
-    "454590"
-)
-
-print(obj_to_test.get_user_info_by_telegram_id(234324234234234, obj_to_test.get_user_token(data_to_add=data_us)))
+        if len(req.content):
+            return True
+        return False
