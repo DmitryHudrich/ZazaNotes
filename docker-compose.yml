@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  server:
+    build: "https://github.com/DmitryHudrich/ZazaNotes.git#:Zaza"
+    ports:
+      - "5000:8080"
+    environment:
+        MONGO_URI: "mongodb://db:27017"
+    depends_on:
+      - db
+  db:
+    image: mongo
+    ports:
+      - "27018:27017"
+
