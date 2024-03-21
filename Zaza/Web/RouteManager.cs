@@ -25,7 +25,11 @@ internal static class RouteManager {
         User();
         Notes();
     }
+    private static void Telegram() {
+        _ = app.MapPost("/telegram/auth", [Authorize] async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, long id) => {
 
+        });
+    }
     private static void Notes() {
         _ = app.MapPost("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
