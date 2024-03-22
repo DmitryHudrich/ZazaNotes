@@ -32,9 +32,9 @@ internal static class RouteManager {
     }
     private static void Telegram() {
         _ = app.MapPost("/telegram/auth", [Authorize] async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserTelegramDTO dto) => {
-            _ = await repository.AddAsync(dto);
+            var code = await repository.AddAsync(dto) ? 201 : 200;
             var user = await repository.FindByFilterAsync(FindFilter.TELEGRAM_ID, dto.Id);
-            return Results.Json(TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions));
+            return Results.Json(data: TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions), statusCode: code);
         });
     }
 
@@ -49,7 +49,7 @@ internal static class RouteManager {
                 return Results.BadRequest("Note wasn't add");
             }
             logger.LogDebug($"{userId}: new note");
-            return Results.Ok();
+            return Results.Created();
         });
 
         _ = app.MapDelete("/user/notes/{id:guid}", [Authorize]
@@ -59,9 +59,9 @@ internal static class RouteManager {
             if (!status) {
                 var err = $"{context.GetName}: note wasn't deleted";
                 logger.LogDebug(err);
-                return Results.BadRequest(err);
+                return Results.NotFound(err);
             }
-            return Results.Ok();
+            return Results.NoContent();
         });
 
         _ = app.MapPut("/user/notes", [Authorize]
@@ -73,7 +73,7 @@ internal static class RouteManager {
                 logger.LogDebug(err);
                 return Results.BadRequest(err);
             }
-            return Results.Ok();
+            return Results.Created();
 
         });
     }
@@ -100,7 +100,7 @@ internal static class RouteManager {
                 logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
                 return Results.BadRequest(err);
             }
-            return Results.Ok();
+            return Results.NoContent();
         });
 
         _ = app.MapPut("/user", [Authorize]
@@ -127,7 +127,7 @@ internal static class RouteManager {
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
                 ? Results.BadRequest($"User: {context.GetName()} is not found or password is wrong")
-                : Results.Ok();
+                : Results.NoContent();
         });
 
         _ = app.MapPost("/auth/telegram", [Authorize]
@@ -137,7 +137,7 @@ internal static class RouteManager {
                 return Results.BadRequest($"User: {context.GetName()} is not found");
             }
             await repository.ChangeTelegramId(context.GetId(), id);
-            return Results.Ok();
+            return Results.NoContent();
         });
 
         /* _ = app.MapGet("/auth/telegram", [Authorize] */
@@ -161,7 +161,7 @@ internal static class RouteManager {
                 logger.LogDebug(err);
                 return Results.Unauthorized();
             };
-            return Results.Ok();
+            return Results.Created();
         });
 
         _ = app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
@@ -199,7 +199,7 @@ internal static class RouteManager {
             cookies.Append("X-Refresh", "");
             cookies.Append("X-Guid", "");
 
-            return Results.Ok();
+            return Results.NoContent();
         });
     }
 }
