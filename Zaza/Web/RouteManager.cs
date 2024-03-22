@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 
 using Zaza.Web.DataBase.Entities;
+using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Exceptions;
 using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
@@ -13,8 +14,11 @@ using Zaza.Web.Stuff.StaticServices;
 namespace Zaza.Web;
 
 internal static class RoutingHelper {
-    public static string GetName(this HttpContext context) => context.User.FindFirstValue(ClaimTypes.Name) ??
+    public static string GetName(this HttpContext context) => context.User.FindFirstValue(ClaimTypes.NameIdentifier) ??
         throw new ArgumentNullException(nameof(context));
+
+    public static Guid GetId(this HttpContext context) => context.User.FindFirstValue(ClaimTypes.SerialNumber) is not string o ?
+      throw new ArgumentNullException(nameof(context)) : Guid.Parse(o);
 }
 
 internal static class RouteManager {
@@ -24,23 +28,27 @@ internal static class RouteManager {
         Auth();
         User();
         Notes();
+        Telegram();
     }
     private static void Telegram() {
-        _ = app.MapPost("/telegram/auth", [Authorize] async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, long id) => {
-
+        _ = app.MapPost("/telegram/auth", [Authorize] async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserTelegramDTO dto) => {
+            _ = await repository.AddAsync(dto);
+            var user = await repository.FindByFilterAsync(FindFilter.TELEGRAM_ID, dto.Id);
+            return Results.Json(TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions));
         });
     }
+
     private static void Notes() {
         _ = app.MapPost("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
             var res = Results.Ok();
-            var username = context.GetName();
-            var newNote = await notes.AddNoteAsync(username, note.Title, note.Text);
+            var userId = context.GetId();
+            var newNote = await notes.AddNoteAsync(userId, note.Title, note.Text);
             if (!newNote) {
-                logger.LogDebug($"{username}: note wasn't add");
+                logger.LogDebug($"{userId}: note wasn't add");
                 return Results.BadRequest("Note wasn't add");
             }
-            logger.LogDebug($"{username}: new note");
+            logger.LogDebug($"{userId}: new note");
             return Results.Ok();
         });
 
@@ -58,7 +66,7 @@ internal static class RouteManager {
 
         _ = app.MapPut("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, ChangedNoteDTO dto, INoteRepository notes) => {
-            var status = await notes.ChangeNoteAsync(dto, context.GetName());
+            var status = await notes.ChangeNoteAsync(dto, context.GetId());
 
             if (!status) {
                 var err = $"{context.GetName}: note wasn't changed";
@@ -73,7 +81,7 @@ internal static class RouteManager {
     private static void User() {
         _ = app.MapGet("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
-            var user = await repository.FindByLoginAsync(context.GetName());
+            var user = await repository.FindByFilterAsync(FindFilter.ID, context.GetId());
             if (user == null) {
                 var err = $"User {context.GetName()} wasn't found in db.";
                 logger.LogDebug(new UserNotFoundException(nameof(user)), err);
@@ -86,7 +94,7 @@ internal static class RouteManager {
 
         _ = app.MapDelete("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
-            var userStatus = await repository.DeleteByLoginAsync(context.GetName());
+            var userStatus = await repository.DeleteByIdAsync(context.GetId());
             if (!userStatus) {
                 var err = $"User {context.GetName()} wasn't found or user doesn't have notes";
                 logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
@@ -97,8 +105,8 @@ internal static class RouteManager {
 
         _ = app.MapPut("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserInfo info, INoteRepository noteRepository) => {
-            var user = context.GetName();
-            return await repository.ChangeInfoAsync(user, info) ? Results.Ok() : Handle();
+            var userId = context.GetId();
+            return await repository.ChangeInfoAsync(userId, info) ? Results.Ok() : Handle();
             IResult Handle() {
                 var err = $"User {context.GetName()} wasn't changed";
                 logger.LogDebug(err);
@@ -108,8 +116,8 @@ internal static class RouteManager {
 
         _ = app.MapGet("/user/notes", [Authorize]
         async (INoteRepository notesRep, HttpContext context) => {
-            var login = context.GetName();
-            var notes = await notesRep.GetNotesAsync(login);
+            var userId = context.GetId();
+            var notes = await notesRep.GetNotesAsync(userId);
             return Results.Json(notes);
         });
     }
@@ -123,20 +131,24 @@ internal static class RouteManager {
         });
 
         _ = app.MapPost("/auth/telegram", [Authorize]
-        async (IUserRepository repository, HttpContext context, long id) => {
-            var user = await repository.FindByLoginAsync(context.GetName());
+        async (IUserRepository repository, HttpContext context, ulong id) => {
+            var user = await repository.FindByFilterAsync(FindFilter.LOGIN, context.GetName());
             if (user == null) {
                 return Results.BadRequest($"User: {context.GetName()} is not found");
             }
-            await repository.ChangeTelegramId(context.GetName(), id);
+            await repository.ChangeTelegramId(context.GetId(), id);
             return Results.Ok();
         });
 
-        _ = app.MapGet("/auth/telegram", [Authorize]
-        async (IUserRepository repository, HttpContext context) => {
-            var user = await repository.FindByLoginAsync(context.GetName());
-            return user == null ? Results.BadRequest($"User: {context.GetName()} is not found") : Results.Json(user.TelegramId);
-        });
+        /* _ = app.MapGet("/auth/telegram", [Authorize] */
+        /* async (IUserRepository repository, HttpContext context) => { */
+        /*     var user = await repository.FindByFilterAsync(FindFilter.LOGIN, context.GetName()); */
+        /*     if (user == null) { */
+        /*         await repository.AddAsync(); */
+        /*     } */
+        /*     return Results.Json( */
+        /*             TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions)); */
+        /* }); */
 
         _ = app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
@@ -155,7 +167,7 @@ internal static class RouteManager {
         _ = app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
             var login = loginRequest.Login;
             var password = loginRequest.Password;
-            var user = await repository.FindByLoginAsync(login);
+            var user = await repository.FindByFilterAsync(FindFilter.LOGIN, login);
             string err;
 
             if (user == null) {
@@ -175,7 +187,7 @@ internal static class RouteManager {
         _ = app.MapGet("/auth/refresh", async (IUserRepository repository, HttpContext context) => {
             var username = context.Request.Cookies["X-Username"];
             var refresh = context.Request.Cookies["X-Refresh"] ?? string.Empty;
-            var user = await repository.FindByRefreshAsync(refresh);
+            var user = await repository.FindByFilterAsync(FindFilter.REFRESH, refresh);
             return user == null ? "саси" : TokenService.MakeJwt(user, context, StaticStuff.SecureCookieOptions);
         });
 
@@ -185,6 +197,7 @@ internal static class RouteManager {
             cookies.Append("X-Username", "");
             cookies.Append("X-Access", "");
             cookies.Append("X-Refresh", "");
+            cookies.Append("X-Guid", "");
 
             return Results.Ok();
         });

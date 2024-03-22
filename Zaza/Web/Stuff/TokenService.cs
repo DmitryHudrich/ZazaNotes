@@ -18,7 +18,16 @@ internal static class TokenService {
     public static string MakeJwt(UserEntity user, HttpContext context, CookieOptions cookieOptions) {
         var logger = context.RequestServices.GetRequiredService<ILogger<JwtSecurityToken>>();
 
-        var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
+        var claims = new List<Claim>();
+        if (user.AuthInfo.Web) {
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Login));
+        }
+        if (user.AuthInfo.Telegram) {
+            claims.Add(new Claim(ClaimTypes.Sid, user.TelegramId.ToString()));
+        }
+
+        claims.Add(new Claim(ClaimTypes.SerialNumber, user.Id.ToString()));
+
         logger.LogDebug("Jwt token expiry: " + StaticStuff.JwtExpire);
         var jwt = new JwtSecurityToken(
             issuer: AuthOptions.ISSUER,
@@ -26,12 +35,16 @@ internal static class TokenService {
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(StaticStuff.JwtExpire)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
-                SecurityAlgorithms.HmacSha256));
+               SecurityAlgorithms.HmacSha256));
 
         var cookies = context.Response.Cookies;
 
         var refresh = GenerateRefreshToken(180);
-        cookies.Append("X-Username", user.Login, cookieOptions);
+        if (user.Login != null) {
+            cookies.Append("X-Username", user.Login, cookieOptions);
+        }
+
+        cookies.Append("X-Guid", user.Id.ToString());
         cookies.Append("X-Access", new JwtSecurityTokenHandler().WriteToken(jwt), cookieOptions);
         cookies.Append("X-Refresh", refresh.Data, cookieOptions);
         _ = context.RequestServices.GetRequiredService<IUserRepository>().ChangeRefreshAsync(user, refresh);
