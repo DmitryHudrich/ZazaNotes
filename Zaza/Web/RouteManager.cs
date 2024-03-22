@@ -140,16 +140,6 @@ internal static class RouteManager {
             return Results.NoContent();
         });
 
-        /* _ = app.MapGet("/auth/telegram", [Authorize] */
-        /* async (IUserRepository repository, HttpContext context) => { */
-        /*     var user = await repository.FindByFilterAsync(FindFilter.LOGIN, context.GetName()); */
-        /*     if (user == null) { */
-        /*         await repository.AddAsync(); */
-        /*     } */
-        /*     return Results.Json( */
-        /*             TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions)); */
-        /* }); */
-
         _ = app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
                 var err = $"{user.Login}: account didn't create, because password must contain more than zero symbols lol ";
