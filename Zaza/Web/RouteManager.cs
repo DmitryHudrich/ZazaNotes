@@ -33,7 +33,7 @@ internal static class RouteManager {
     }
 
     private static void Health() {
-        _ = app.MapGet("/health/ping", () => Results.Json("pong"));
+        _ = app.MapGet("/health/ping", () => "pong");
     }
 
     private static void Telegram() {
