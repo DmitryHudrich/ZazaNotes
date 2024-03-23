@@ -1,6 +1,6 @@
 import requests
 
-from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram
+from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram, UserUpdate
 from ZazaBot.src.others.config_for_bot import ConfigUserData
 
 
@@ -72,7 +72,7 @@ class User:
             return req.json()
         return False
 
-    def del_user_by_token(self, user_token: str) -> bool:
+    def del_user_by_token(self) -> bool:
         """
         Del user by token
         :param user_token:
@@ -82,11 +82,9 @@ class User:
         req = requests.delete(
             url=self.app_url + "/user",
             headers={
-                "Authorization": "Bearer " + user_token
+                "Authorization": "Bearer " + ConfigUserData.token
             }
         )
-
-        print(req)
 
         if req.status_code == 200:
             return True
@@ -107,3 +105,22 @@ class User:
 
         ConfigUserData.cookies = req.headers
         ConfigUserData.token = req.text
+
+    def update_user(self, data_to_update: UserUpdate) -> bool:
+        """
+        Update user
+        :param data_to_update:
+        :return:
+        """
+
+        req = requests.Session()
+        req = req.put(
+            url=self.app_url + "/user",
+            headers={
+                "Authorization": "Bearer " + ConfigUserData.token
+            },
+            json=data_to_update.get_dict()
+        )
+
+        if req.status_code in (200, 201): return True
+        return False

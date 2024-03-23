@@ -60,3 +60,21 @@ class UserTelegram:
             "id": self.id,
             "photo": self.photo
         }
+
+
+@dataclass
+class UserUpdate:
+    firstName: str
+    lastName: str
+    description: str
+    country: str
+    photo: str
+
+    def get_dict(self) -> dict:
+        return {
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "description": self.description,
+            "country": self.country,
+            "photo": self.photo
+        }
