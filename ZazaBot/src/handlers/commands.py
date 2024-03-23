@@ -67,9 +67,7 @@ async def my_profile(message: Message):
     data_user: dict = dict(usr.get_userinfo_by_token(user_token=ConfigUserData.token))
     note = Note().get_notes()
     message_to_user: str = await text_for_my_profile(data_my_profile=data_user)
-    await message.answer_photo(photo=data_user.get("info")["photo"], caption=message_to_user+'\n<b>Количество заметок</b>: '
-                                                                                             f'{len(note)}',
-                               reply_markup=await create_bt_profile(), parse_mode="HTML")
+    await message.answer_photo(photo=data_user.get("info")["photo"], caption=f"<b>Количество заметок: {len(note)}</b>", reply_markup=await create_bt_profile(), parse_mode="HTML")
 
 
 @command_router.message(Command("my_notes"))
