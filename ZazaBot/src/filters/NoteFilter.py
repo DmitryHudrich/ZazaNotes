@@ -1,7 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram import types
 
-from ZazaBot.src.api.NoteAPI import Note
+from src.api.NoteAPI import Note
 
 
 class DeleteNote(BaseFilter):

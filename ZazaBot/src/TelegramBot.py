@@ -3,12 +3,12 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from ZazaBot.configuration import telegram_bot_id
-from ZazaBot.src.handlers.commands import command_router
-from ZazaBot.src.handlers.messages import message_handler
-from ZazaBot.src.handlers.callbacks import clb_router
-from ZazaBot.src.utils.additionally.add_commands import set_commands_for_bot, set_description_for_bot
-from ZazaBot.src.middleware.AuthUser import AuthorizationUser
+from configuration import telegram_bot_id
+from src.handlers.commands import command_router
+from src.handlers.messages import message_handler
+from src.handlers.callbacks import clb_router
+from src.utils.additionally.add_commands import set_commands_for_bot, set_description_for_bot
+from src.middleware.AuthUser import AuthorizationUser
 
 
 Zaza_bot: Bot = Bot(token=telegram_bot_id)

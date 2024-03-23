@@ -3,13 +3,13 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from ZazaBot.src.utils import text_for_helpcm
-from ZazaBot.src.api.UserAPI import User
-from ZazaBot.src.api.NoteAPI import Note
-from ZazaBot.src.states.NotesState import CreateNote
-from ZazaBot.src.others.config_for_bot import ConfigUserData
-from ZazaBot.src.utils.text import text_for_my_profile
-from ZazaBot.src.kb.inl_kb import create_bt_profile, create_bt_note
+from src.utils import text_for_helpcm
+from src.api.UserAPI import User
+from src.api.NoteAPI import Note
+from src.states.NotesState import CreateNote
+from src.others.config_for_bot import ConfigUserData
+from src.utils.text import text_for_my_profile
+from src.kb.inl_kb import create_bt_profile, create_bt_note
 
 #Router for commands
 command_router: Router = Router()

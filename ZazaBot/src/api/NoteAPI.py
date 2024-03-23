@@ -2,9 +2,9 @@ import logging
 
 import requests
 
-from ZazaBot.src.api.UserAPI import User, UserTelegram
-from ZazaBot.src.data.NoteData import AddNote, UpdateNote
-from ZazaBot.src.others.config_for_bot import ConfigUserData
+from src.api.UserAPI import User, UserTelegram
+from src.data.NoteData import AddNote, UpdateNote
+from src.others.config_for_bot import ConfigUserData
 
 
 class Note(User):

@@ -2,7 +2,7 @@ from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram import types
 from typing import Callable, Dict, Any, Awaitable
 
-from ZazaBot.src.api.UserAPI import User, UserTelegram
+from src.api.UserAPI import User, UserTelegram
 
 import logging
 

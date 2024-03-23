@@ -1,7 +1,7 @@
 import requests
 
-from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram, UserUpdate
-from ZazaBot.src.others.config_for_bot import ConfigUserData
+from src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram, UserUpdate
+from src.others.config_for_bot import ConfigUserData
 
 
 class User:

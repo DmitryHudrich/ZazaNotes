@@ -2,13 +2,13 @@ from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 
 
-from ZazaBot.src.handlers.commands import help_command
-from ZazaBot.src.states.UserState import UpdateUser
-from ZazaBot.src.states.NotesState import CreateNote, UpdateNote as upd_note
-from ZazaBot.src.api.NoteAPI import Note, AddNote
-from ZazaBot.src.api.UserAPI import User
-from ZazaBot.src.data.UserData import UserUpdate
-from ZazaBot.src.data.NoteData import UpdateNote
+from src.handlers.commands import help_command
+from src.states.UserState import UpdateUser
+from src.states.NotesState import CreateNote, UpdateNote as upd_note
+from src.api.NoteAPI import Note, AddNote
+from src.api.UserAPI import User
+from src.data.UserData import UserUpdate
+from src.data.NoteData import UpdateNote
 
 
 #Message handler

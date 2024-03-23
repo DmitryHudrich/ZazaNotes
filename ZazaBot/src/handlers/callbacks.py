@@ -1,12 +1,12 @@
 from aiogram import types, Router
 from aiogram.fsm.context import FSMContext
 
-from ZazaBot.src.filters.UserFilter import DeleteUser, UpdateUser
-from ZazaBot.src.filters.NoteFilter import DeleteNote, UpdateNote
-from ZazaBot.src.api.UserAPI import User
-from ZazaBot.src.api.NoteAPI import Note
-from ZazaBot.src.states.UserState import UpdateUser as upd_usr
-from ZazaBot.src.states.NotesState import UpdateNote as upd_note
+from src.filters.UserFilter import DeleteUser, UpdateUser
+from src.filters.NoteFilter import DeleteNote, UpdateNote
+from src.api.UserAPI import User
+from src.api.NoteAPI import Note
+from src.states.UserState import UpdateUser as upd_usr
+from src.states.NotesState import UpdateNote as upd_note
 
 
 #Callbacks router
