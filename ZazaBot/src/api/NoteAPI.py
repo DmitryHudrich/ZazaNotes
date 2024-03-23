@@ -3,7 +3,7 @@ import logging
 import requests
 
 from ZazaBot.src.api.UserAPI import User, UserTelegram
-from ZazaBot.src.data.NoteData import AddNote
+from ZazaBot.src.data.NoteData import AddNote, UpdateNote
 from ZazaBot.src.others.config_for_bot import ConfigUserData
 
 
@@ -54,3 +54,46 @@ class Note(User):
         )
 
         return list(req.json())
+
+    def del_note(self, id_note: str) -> bool:
+        """
+        Del note by id
+        :param id_note:
+        :return:
+        """
+
+        req = requests.Session()
+        print(ConfigUserData.token)
+        req = req.delete(
+            url=self.app_url + "/user/notes/"+id_note,
+            headers = {
+                "Authorization": "Bearer " + ConfigUserData.token
+            }
+        )
+
+        print(req)
+        print(req.status_code)
+
+        if req.status_code in (200, 201, 204):
+            return True
+        return False
+
+    def update_note(self, data_to_put: UpdateNote) -> bool:
+        """
+        Update note by id
+        :param data_to_put:
+        :return:
+        """
+
+        req = requests.Session()
+        req = req.put(
+            url=self.app_url + "/user/notes",
+            headers={
+                "Authorization": "Bearer " + ConfigUserData.token
+            },
+            json=data_to_put.get_dict()
+        )
+
+
+        if req in (200, 201, 204): return True
+        return False

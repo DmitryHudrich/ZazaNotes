@@ -15,5 +15,6 @@ class UpdateNote(StatesGroup):
     State for update note
     """
 
+    guid: str = State()
     title: str = State()
     text: str = State()

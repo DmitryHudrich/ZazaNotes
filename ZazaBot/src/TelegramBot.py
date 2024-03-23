@@ -46,3 +46,5 @@ async def telegram_application() -> None:
         await dp_bot.start_polling(Zaza_bot)
     except KeyboardInterrupt:
         logging.exception(msg="Бот окончил свою работу")
+    finally:
+        await dp_bot.stop_polling()

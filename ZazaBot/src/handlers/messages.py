@@ -4,10 +4,11 @@ from aiogram.fsm.context import FSMContext
 
 from ZazaBot.src.handlers.commands import help_command
 from ZazaBot.src.states.UserState import UpdateUser
-from ZazaBot.src.states.NotesState import CreateNote
+from ZazaBot.src.states.NotesState import CreateNote, UpdateNote as upd_note
 from ZazaBot.src.api.NoteAPI import Note, AddNote
 from ZazaBot.src.api.UserAPI import User
 from ZazaBot.src.data.UserData import UserUpdate
+from ZazaBot.src.data.NoteData import UpdateNote
 
 
 #Message handler
@@ -88,6 +89,27 @@ async def set_photo_user(message: types.Message, state: FSMContext):
     else:
         await message.answer(text="Вы прислали не фото!")
         await state.set_state(UpdateUser.photo)
+
+
+#Update Note
+@message_handler.message(upd_note.title)
+async def update_title_note(message: types.Message, state: FSMContext):
+    await state.update_data(title=message.text)
+    await state.set_state(upd_note.text)
+    await message.answer(text="Введите новый текст вашей заметки")
+
+
+@message_handler.message(upd_note.text)
+async def update_title_note(message: types.Message, state: FSMContext):
+    await state.update_data(text=message.text)
+
+    #Update Note
+    Note().update_note(
+        data_to_put=UpdateNote(**await state.get_data())
+    )
+
+    await message.answer(text="Отлично, ваша заметка успешно обновлена!")
+    await state.clear()
 
 
 @message_handler.message()
