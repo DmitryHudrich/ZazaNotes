@@ -130,16 +130,6 @@ internal static class RouteManager {
                 : Results.NoContent();
         });
 
-        _ = app.MapPost("/auth/telegram",
-        async (IUserRepository repository, HttpContext context, ulong id) => {
-            var user = await repository.FindByFilterAsync(FindFilter.LOGIN, context.GetName());
-            if (user == null) {
-                return Results.BadRequest($"User: {context.GetName()} is not found");
-            }
-            await repository.ChangeTelegramId(context.GetId(), id);
-            return Results.NoContent();
-        });
-
         _ = app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
             if (string.IsNullOrWhiteSpace(user.Password)) {
                 var err = $"{user.Login}: account didn't create, because password must contain more than zero symbols lol ";
