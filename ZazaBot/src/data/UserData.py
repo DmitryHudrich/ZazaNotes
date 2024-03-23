@@ -45,3 +45,18 @@ class UserToken:
             "login": self.login,
             "password": self.password
         }
+
+@dataclass
+class UserTelegram:
+    firstName: str
+    lastName: str
+    id: int
+    photo: str
+
+    def get_dict(self) -> dict:
+        return {
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "id": self.id,
+            "photo": self.photo
+        }

@@ -1,6 +1,6 @@
 import requests
 
-from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo
+from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram
 
 
 class User:
@@ -13,20 +13,24 @@ class User:
         self.app_url = "http://localhost:5000"
 
 
-    def add_user(self, data_to_add: AddUser) -> bool:
+    def add_user(self, data_to_add: UserTelegram) -> str:
         """
         Add user
         :param data_to_add:
         :return:
         """
+
         req = requests.post(
-            url=self.app_url+"/auth/reg",
+            url=self.app_url+"/telegram/auth",
             json=data_to_add.get_dict()
         )
-        print(req)
-        if req.status_code == 200:
-            return True
-        return False
+
+        if req.status_code == 201:
+            return "User is created"
+        elif req.status_code == 200:
+            return "User was created"
+        else:
+            return "Error"
 
 
     def get_user_token(self, data_to_add: UserToken) -> bool | str:
@@ -41,7 +45,7 @@ class User:
             json=data_to_add.get_dict()
         )
 
-        if req.status_code == 200:
+        if req.status_code in (200, 201):
             response = req.json()
             return response
         return False
@@ -61,7 +65,7 @@ class User:
             }
         )
 
-        if req.status_code == 200:
+        if req.status_code in (200, 201):
             return req.json()
         return False
 
@@ -87,22 +91,21 @@ class User:
         return False
 
 
-    def get_user_info_by_telegram_id(self, tg_id: int, user_token: int) -> bool:
+    def get_user_info_by_telegram_id(self, tg_id: int) -> bool:
         """
         Get user info by tg_id
         :param tg_id:
         :return:
         """
 
-        req = requests.get(
-            url=self.app_url+"/auth/telegram",
+        req = requests.post(
+            url=self.app_url+"/telegram/auth",
             params={
                 "id": tg_id
-            },
-            headers={
-                "Authorization": "Bearer " + user_token
-            },
+            }
         )
+        print(req)
+        print(req.content)
 
         if len(req.content):
             return True
