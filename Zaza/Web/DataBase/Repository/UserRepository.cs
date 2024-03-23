@@ -27,6 +27,12 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
     public async Task<bool> AddAsync(UserMainDTO user) => await HandleUserRegistration(place: RegistrationPlace.FROM_API, apiDTO: user);
 
     private async Task<bool> HandleUserRegistration(RegistrationPlace place, UserMainDTO? apiDTO = default, UserTelegramDTO? telegramDTO = default) {
+        var filter = place switch {
+            RegistrationPlace.TELEGRAM => Builders<UserEntity>.Filter.Eq(u => u.TelegramId, telegramDTO!.Id),
+            RegistrationPlace.FROM_API => Builders<UserEntity>.Filter.Eq(u => u.Login, apiDTO!.Login),
+            RegistrationPlace.UNKNOWN => default,
+            _ => default,
+        };
         var user = place switch {
             RegistrationPlace.TELEGRAM =>
                 telegramDTO != null
@@ -59,19 +65,18 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
             _ => default,
         };
 
-        return user != null && await AddToDb(user);
+        return user != null && await AddToDb(user, filter);
     }
 
-    private async Task<bool> AddToDb(UserEntity user) {
+    private async Task<bool> AddToDb(UserEntity user, FilterDefinition<UserEntity>? filter) {
         var item = user;
-        var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, user.Login);
         var exists = await mongo.Users.FindAsync(filter);
 
         if (exists.Any()) {
             logger.LogDebug($"User: {user.Login} already exists");
             return false;
         }
-
+        System.Console.WriteLine(user);
         await mongo.Users.InsertOneAsync(item);
 
         return true;
@@ -161,7 +166,7 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
         var filer =
             Builders<UserEntity>.Filter.Eq(u => u.Refresh.Data, refreshToken);
         var res = await mongo.Users.FindAsync(filer);
-        return res.First();
+        return res.FirstOrDefault();
     }
 }
 
