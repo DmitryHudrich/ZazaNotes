@@ -6,16 +6,16 @@ using Zaza.Web.Stuff.DTO.Request;
 namespace Zaza.Web.DataBase.Repository;
 
 internal sealed class NoteRepository(IUserRepository userRepository, MongoService mongo) : INoteRepository {
-    public async Task<bool> AddNoteAsync(string login, string title, string text) {
-        var filter = Builders<UserEntity>.Filter.Eq(u => u.Login, login);
+    public async Task<bool> AddNoteAsync(Guid id, string title, string text) {
+        var filter = Builders<UserEntity>.Filter.Eq(u => u.Id, id);
         var update = Builders<UserEntity>.Update.Push(u => u.Notes, new NoteEntity(Guid.NewGuid(), title, text));
         var updateResult = await mongo.Users.UpdateOneAsync(filter, update);
 
         return updateResult.ModifiedCount > 0;
     }
 
-    public async Task<List<NoteEntity>> GetNotesAsync(string login) {
-        var user = await GetUserAsync(login);
+    public async Task<List<NoteEntity>> GetNotesAsync(Guid userId) {
+        var user = await GetUserAsync(userId);
         return user == null ? [] : user.Notes;
     }
 
@@ -27,9 +27,9 @@ internal sealed class NoteRepository(IUserRepository userRepository, MongoServic
         return res != null;
     }
 
-    public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote, string login) {
+    public async Task<bool> ChangeNoteAsync(ChangedNoteDTO newNote, Guid id) {
         var filter = Builders<UserEntity>.Filter.And(
-            Builders<UserEntity>.Filter.Eq(u => u.Login, login),
+            Builders<UserEntity>.Filter.Eq(u => u.Id, id),
             Builders<UserEntity>.Filter.ElemMatch(u => u.Notes, Builders<NoteEntity>.Filter.Eq(n => n.Id, newNote.Guid))
         );
 
@@ -40,8 +40,8 @@ internal sealed class NoteRepository(IUserRepository userRepository, MongoServic
         return result != null;
     }
 
-    private async Task<UserEntity?> GetUserAsync(string login) {
-        var res = await userRepository.FindByLoginAsync(login);
+    private async Task<UserEntity?> GetUserAsync(Guid id) {
+        var res = await userRepository.FindByFilterAsync(FindFilter.ID, id);
         return res;
     }
 }
