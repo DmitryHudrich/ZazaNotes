@@ -8,9 +8,11 @@ from ZazaBot.src.handlers.commands import command_router
 from ZazaBot.src.handlers.messages import message_handler
 from ZazaBot.src.utils.additionally.add_commands import set_commands_for_bot, set_description_for_bot
 from ZazaBot.src.middleware.AuthUser import AuthorizationUser
+from ZazaBot.src.others.config_for_bot import ConfigUserData
 
 
 Zaza_bot: Bot = Bot(token=telegram_bot_id)
+
 
 async def telegram_application() -> None:
     """
@@ -37,6 +39,7 @@ async def telegram_application() -> None:
 
     #Set middleware for bot
     dp_bot.message.middleware.register(AuthorizationUser())
+
 
     try:
         await dp_bot.start_polling(Zaza_bot)

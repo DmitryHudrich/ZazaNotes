@@ -2,6 +2,7 @@ import requests
 
 from ZazaBot.src.api.UserAPI import User, UserTelegram
 from ZazaBot.src.data.NoteData import AddNote
+from ZazaBot.src.others.config_for_bot import ConfigUserData
 
 
 class Note(User):
@@ -10,18 +11,17 @@ class Note(User):
         #Initializa data from User class
         super().__init__()
 
-    def add_note(self, data_to_add: AddNote, data_user: UserTelegram):
+    def add_note(self, data_to_add: AddNote):
         """
         Add note
         :param data_to_add:
         :return:
         """
 
-        usr_token = self.add_user(data_to_add=data_user)
         req = requests.post(
             url=self.app_url+"/user/notes",
             headers={
-              "Authorization": "Bearer " + usr_token
+              "Authorization": "Bearer " + ConfigUserData.token
             },
             json=data_to_add.get_dict()
         )
@@ -30,18 +30,3 @@ class Note(User):
         if req.status_code == 200:
             return True
         return False
-
-
-note = Note()
-print(note.add_note(
-    data_to_add=AddNote(
-        "sdasd",
-        "dada"
-    ),
-    data_user=UserTelegram(
-        "Silmarion",
-        "null",
-        912824014,
-        "AgACAgIAAxkDAANNZf70oeZn1BLvcwzs8pAh_uNaWt4AAqmnMRvOlmg2RZUNjmfEeRUBAAMCAANhAAM0BA"
-    )
-))

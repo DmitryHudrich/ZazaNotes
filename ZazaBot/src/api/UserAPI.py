@@ -1,6 +1,7 @@
 import requests
 
 from ZazaBot.src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram
+from ZazaBot.src.others.config_for_bot import ConfigUserData
 
 
 class User:
@@ -24,6 +25,9 @@ class User:
             json=data_to_add.get_dict()
         )
 
+        ConfigUserData.cookies = dict(req.headers)
+        ConfigUserData.token = req.text
+
         if req.status_code == 201:
             return "User is created"
         elif req.status_code == 200:
@@ -37,8 +41,8 @@ class User:
         :param data_to_add:
         :return:
         """
-
-        req = requests.post(
+        session = requests.Session()
+        req = session.post(
             url=self.app_url+"/auth/login",
             json=data_to_add.get_dict()
         )
@@ -86,30 +90,18 @@ class User:
             return True
         return False
 
-    def get_user_info_by_telegram_id(self, tg_id: int) -> bool:
-        """
-        Get user info by tg_id
-        :param tg_id:
-        :return:
-        """
-
-        req = requests.post(
-            url=self.app_url+"/telegram/auth",
-            params={
-                "id": tg_id
-            }
-        )
-        print(req)
-        print(req.content)
-
-        if len(req.content):
-            return True
-        return False
-
-    def get_new_token(self, old_token: str) -> str:
+    def get_new_token(self) -> None:
         """
         Take new token
         :param old_token:
         :return:
         """
 
+        req = requests.Session()
+        req = req.get(
+            url=self.app_url+"/auth/refresh",
+            headers=ConfigUserData.cookies
+        )
+
+        ConfigUserData.cookies = req.headers
+        ConfigUserData.token = req.text
