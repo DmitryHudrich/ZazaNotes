@@ -5,6 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from ZazaBot.configuration import telegram_bot_id
 from ZazaBot.src.handlers.commands import command_router
+from ZazaBot.src.handlers.messages import message_handler
 from ZazaBot.src.utils.additionally.add_commands import set_commands_for_bot, set_description_for_bot
 from ZazaBot.src.middleware.AuthUser import AuthorizationUser
 
@@ -26,7 +27,8 @@ async def telegram_application() -> None:
 
     #Include routers
     dp_bot.include_routers(
-        command_router
+        command_router,
+        message_handler,
     )
 
     #Set data for bot
