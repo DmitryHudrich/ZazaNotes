@@ -85,8 +85,7 @@ async def my_notes(message: Message):
 
     for note in all_notes:
         note = dict(note)
-        message_note: str = (f"<b>Заголовок</b>: {note.get("title")}\n\n" + \
-                        f"<b>Текст</b>: \n\n{note.get("text")}")
+        message_note: str = (f"<b>Заголовок</b>: {note.get("title")}\n\n" + f"<b>Текст</b>: \n\n{note.get("text")}")
 
         await message.answer(
             text=message_note,
