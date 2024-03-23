@@ -14,7 +14,8 @@ async def set_commands_for_bot(bot) -> None:
             BotCommand(command="my_profile", description="Мой профиль"),
             BotCommand(command="start", description="Начало работы"),
             BotCommand(command="help", description="Помощь"),
-            BotCommand(command="create_note", description="Создание заметки")
+            BotCommand(command="create_note", description="Создание заметки"),
+            BotCommand(command="my_notes", description="Мои заметки")
         ]
     ))
     

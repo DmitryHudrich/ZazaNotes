@@ -28,7 +28,6 @@ class User:
 
         ConfigUserData.cookies = dict(req.headers)
         ConfigUserData.token = req.json()
-        print(ConfigUserData.token)
 
         if req.status_code == 201:
             return "User is created"

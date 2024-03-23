@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 
 from ZazaBot.src.utils import text_for_helpcm
 from ZazaBot.src.api.UserAPI import User
+from ZazaBot.src.api.NoteAPI import Note
 from ZazaBot.src.states.NotesState import CreateNote
 from ZazaBot.src.others.config_for_bot import ConfigUserData
 from ZazaBot.src.utils.text import text_for_my_profile
@@ -64,5 +65,29 @@ async def my_profile(message: Message):
 
     usr = User()
     data_user: dict = dict(usr.get_userinfo_by_token(user_token=ConfigUserData.token))
+    note = Note().get_notes()
     message_to_user: str = await text_for_my_profile(data_my_profile=data_user)
-    await message.answer_photo(photo=data_user.get("info")["photo"], caption=message_to_user, reply_markup=await create_bt_profile())
+    await message.answer_photo(photo=data_user.get("info")["photo"], caption=message_to_user+'\n<b>Количество заметок</b>: '
+                                                                                             f'{len(note)}',
+                               reply_markup=await create_bt_profile(), parse_mode="HTML")
+
+
+@command_router.message(Command("my_notes"))
+async def my_notes(message: Message):
+    """
+    Getting user notes
+    :param message:
+    :return:
+    """
+
+    all_notes: list = Note().get_notes()
+
+    for note in all_notes:
+        note = dict(note)
+        message_note: str = (f"<b>Заголовок</b>: {note.get("title")}\n\n" + \
+                        f"<b>Текст</b>: \n\n{note.get("text")}")
+
+        await message.answer(
+            text=message_note,
+            parse_mode="HTML"
+        )

@@ -38,3 +38,19 @@ class Note(User):
                 self.add_note(data_to_add=data_to_add)
             else:
                 logging.info(msg="Doesnt to create note for user")
+
+    def get_notes(self) -> list:
+        """
+        Get notes for user token
+        :return:
+        """
+
+        req = requests.Session()
+        req = req.get(
+            url=self.app_url + "/user/notes",
+            headers={
+                "Authorization": "Bearer " + ConfigUserData.token
+            }
+        )
+
+        return list(req.json())
