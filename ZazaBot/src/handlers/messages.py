@@ -25,10 +25,15 @@ async def set_text_note(message: types.Message, state: FSMContext) -> None:
 
     #Тут должен быть create note, но их нет.
     note_to_add: AddNote = AddNote(
-        await state.get_data()
+        **(await state.get_data())
     )
 
-    print(note_to_add.get_dict())
+    note_service = Note()
+
+    note_service.add_note(
+        data_to_add=note_to_add
+    )
+
     await state.clear()
 
 @message_handler.message()

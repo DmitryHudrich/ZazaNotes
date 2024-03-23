@@ -20,13 +20,15 @@ class User:
         :return:
         """
 
-        req = requests.post(
+        req = requests.Session()
+        req = req.post(
             url=self.app_url+"/telegram/auth",
             json=data_to_add.get_dict()
         )
 
         ConfigUserData.cookies = dict(req.headers)
-        ConfigUserData.token = req.text
+        ConfigUserData.token = req.json()
+        print(ConfigUserData.token)
 
         if req.status_code == 201:
             return "User is created"

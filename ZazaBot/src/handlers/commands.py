@@ -4,8 +4,11 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 from ZazaBot.src.utils import text_for_helpcm
+from ZazaBot.src.api.UserAPI import User
 from ZazaBot.src.states.NotesState import CreateNote
-
+from ZazaBot.src.others.config_for_bot import ConfigUserData
+from ZazaBot.src.utils.text import text_for_my_profile
+from ZazaBot.src.kb.inl_kb import create_bt_profile
 
 #Router for commands
 command_router: Router = Router()
@@ -49,3 +52,17 @@ async def create_note(message: Message, state: FSMContext):
     await message.answer(text="Отлично, создаем вам заметку...")
     await message.answer(text="Пожалуйста введите заголовок вашей заметки")
     await state.set_state(CreateNote.title)
+
+
+@command_router.message(Command("my_profile"))
+async def my_profile(message: Message):
+    """
+    Profile user
+    :param message:
+    :return:
+    """
+
+    usr = User()
+    data_user: dict = dict(usr.get_userinfo_by_token(user_token=ConfigUserData.token))
+    message_to_user: str = await text_for_my_profile(data_my_profile=data_user)
+    await message.answer_photo(photo=data_user.get("info")["photo"], caption=message_to_user, reply_markup=await create_bt_profile())

@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 from ZazaBot.src.api.UserAPI import User, UserTelegram
@@ -11,7 +13,7 @@ class Note(User):
         #Initializa data from User class
         super().__init__()
 
-    def add_note(self, data_to_add: AddNote):
+    def add_note(self, data_to_add: AddNote, flag=True):
         """
         Add note
         :param data_to_add:
@@ -26,7 +28,13 @@ class Note(User):
             json=data_to_add.get_dict()
         )
 
-        print(req.content)
         if req.status_code == 200:
             return True
-        return False
+        else:
+            if flag is not True:
+
+                User().get_new_token()
+                flag=False
+                self.add_note(data_to_add=data_to_add)
+            else:
+                logging.info(msg="Doesnt to create note for user")
