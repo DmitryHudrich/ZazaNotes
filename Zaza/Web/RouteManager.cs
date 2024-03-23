@@ -31,7 +31,7 @@ internal static class RouteManager {
         Telegram();
     }
     private static void Telegram() {
-        _ = app.MapPost("/telegram/auth", [Authorize] async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserTelegramDTO dto) => {
+        _ = app.MapPost("/telegram/auth", async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserTelegramDTO dto) => {
             var code = await repository.AddAsync(dto) ? 201 : 200;
             var user = await repository.FindByFilterAsync(FindFilter.TELEGRAM_ID, dto.Id);
             return Results.Json(data: TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions), statusCode: code);
