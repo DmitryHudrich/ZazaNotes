@@ -66,3 +66,6 @@ LogLevel LoadLogLevel() {
         _ => throw new ArgumentException("Unknown log level was set in configuration"),
     };
 }
+
+// for tests
+public partial class Program { }

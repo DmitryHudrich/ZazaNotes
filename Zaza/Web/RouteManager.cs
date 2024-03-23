@@ -130,7 +130,7 @@ internal static class RouteManager {
                 : Results.NoContent();
         });
 
-        _ = app.MapPost("/auth/telegram", [Authorize]
+        _ = app.MapPost("/auth/telegram",
         async (IUserRepository repository, HttpContext context, ulong id) => {
             var user = await repository.FindByFilterAsync(FindFilter.LOGIN, context.GetName());
             if (user == null) {
