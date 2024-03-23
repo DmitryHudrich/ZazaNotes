@@ -76,7 +76,6 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
             logger.LogDebug($"User: {user.Login} already exists");
             return false;
         }
-        System.Console.WriteLine(user);
         await mongo.Users.InsertOneAsync(item);
 
         return true;
