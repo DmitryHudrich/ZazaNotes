@@ -47,7 +47,7 @@ dotnet_diagnostic.CA1848.severity = none
 dotnet_diagnostic.CA1305.severity = none
 dotnet_diagnostic.IDE0090.severity = none
 dotnet_diagnostic.IDE0011.severity = none
-
+dotnet_diagnostic.CA1805.severity = none
 
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
