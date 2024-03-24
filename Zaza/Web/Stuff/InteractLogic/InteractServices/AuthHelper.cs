@@ -23,10 +23,10 @@ internal static class AuthHelper {
             qualityPoints++;
         }
         var res = qualityPoints switch {
-            0 => PasswordQuality.BAD,
-            1 => PasswordQuality.WEAK,
-            2 => PasswordQuality.GOOD,
-            3 => PasswordQuality.STRONG,
+            1 => PasswordQuality.BAD,
+            2 => PasswordQuality.WEAK,
+            3 => PasswordQuality.GOOD,
+            4 => PasswordQuality.STRONG,
             _ => PasswordQuality.STRONG
         };
         return res;

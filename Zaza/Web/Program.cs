@@ -27,7 +27,7 @@ builder.Services.AddScoped<AuthInteractions>();
 builder.Services.AddCors();
 
 var app = builder.Build();
-app.Logger.LogInformation("MongoString: " + Environment.GetEnvironmentVariable(StaticStuff.MongoStingEnvName));
+app.Logger.LogInformation("MongoString: " + Environment.GetEnvironmentVariable(StaticStuff.MongoStringEnvName));
 if (State.UseSwagger) {
     app.Logger.LogInformation("Enabling swagger");
     _ = app.UseSwagger();

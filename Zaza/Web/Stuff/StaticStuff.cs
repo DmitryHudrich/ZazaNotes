@@ -4,8 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Zaza.Web.Stuff;
 
 internal static class StaticStuff {
-    public static readonly string MongoStingEnvName = "MONGO_URI";
-    public static readonly string MongoStingDefault = "mongodb://localhost:27017";
+    public static readonly string MongoStringEnvName = "MONGO_URI";
+    public static readonly string MongoStringDefault = "mongodb://localhost:27017";
 
     public static readonly CookieOptions SecureCookieOptions = new CookieOptions {
         HttpOnly = true,

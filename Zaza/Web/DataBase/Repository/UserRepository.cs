@@ -71,15 +71,16 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
     private async Task<bool> AddToDb(UserEntity user, FilterDefinition<UserEntity>? filter) {
         var item = user;
         var exists = await mongo.Users.FindAsync(filter);
+        var exists1 = await mongo.Users.FindAsync(filter);
 
         if (exists.Any()) {
             logger.LogDebug($"User: {user.Login} already exists");
+            logger.LogDebug($"User id: {exists1.ToList().FirstOrDefault()}");
             return false;
         }
         await mongo.Users.InsertOneAsync(item);
 
         return true;
-
     }
 
     public async Task<bool> DeleteByIdAsync(Guid id) {

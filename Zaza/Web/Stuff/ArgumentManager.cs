@@ -10,12 +10,12 @@ internal static class ArgumentManager {
             Flag = "--mongo",
             Decription = "MongoDb connection string. May be 'default' or 'exist' or 'mongodb://<host>:<port>'",
             Values = new Dictionary<string, Action<string>> {
-                { "test", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, StaticStuff.MongoStingDefault + "/test") },
-                { "default", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, StaticStuff.MongoStingDefault) },
-                { "exist", (string _) => { if (Environment.GetEnvironmentVariable(StaticStuff.MongoStingEnvName) == null) {
+                { "test", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStringEnvName, StaticStuff.MongoStringDefault + "/test") },
+                { "default", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStringEnvName, StaticStuff.MongoStringDefault) },
+                { "exist", (string _) => { if (Environment.GetEnvironmentVariable(StaticStuff.MongoStringEnvName) == null) {
                     Environment.Exit(-2);
                 }}},
-                { @"^mongodb://\w*", (string value) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, value) },
+                { @"^mongodb://\w*", (string value) => Environment.SetEnvironmentVariable(StaticStuff.MongoStringEnvName, value) },
             }
         },
         new Arg {

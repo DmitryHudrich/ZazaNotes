@@ -28,10 +28,18 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
     public async Task<InteractResult<PasswordQuality>> RegisterUser(UserMainDTO userDTO) {
         var passwordQuality = PasswordQuality.STRONG;
         var status = true;
+
         if (!State.DisablePasswordValidation) {
             passwordQuality = AuthHelper.ValidatePassword(userDTO.Password);
         }
-        if (!await UserRepository.AddAsync(userDTO) && passwordQuality != PasswordQuality.BAD) {
+
+        if (passwordQuality == PasswordQuality.BAD) {
+            var err = $"{userDTO} password is too weak";
+            status = false;
+            logger.LogDebug(err);
+        };
+
+        if (!status || !await UserRepository.AddAsync(userDTO)) {
             var err = $"{userDTO} wasn't added to database";
             status = false;
             logger.LogDebug(err);
@@ -47,7 +55,6 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
 
         return res;
     }
-
 
     public async Task<InteractResult> LoginUser(UserLoginRequestDTO userDTO) {
         if (!State.DisablePasswordValidation) {

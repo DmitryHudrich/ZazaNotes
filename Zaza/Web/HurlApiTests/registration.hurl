@@ -1,6 +1,23 @@
 POST {{HOST}}/testing/flush
 HTTP 202
 
+POST {{HOST}}/auth/reg
+Content-Type: application/json
+[Options]
+very-verbose: false
+{
+    "login": "{{LOGIN}}",
+    "info": {
+        "firstName": "string",
+        "lastName": "string",
+        "description": "string",
+        "country": "string",
+        "photo": "string"
+    },
+    "password": "{{BAD_PASSWORD}}"
+}
+HTTP 400
+
 
 POST {{HOST}}/auth/reg
 Content-Type: application/json
@@ -15,15 +32,16 @@ very-verbose: true
         "country": "string",
         "photo": "string"
     },
-    "password": "{{PASSWORD}}"
+    "password": "{{GOOD_PASSWORD}}"
 }
 HTTP 201
+
 
 POST {{HOST}}/auth/login
 Content-Type: application/json
 {
     "login": "{{LOGIN}}",
-    "password": "{{PASSWORD}}"
+    "password": "{{GOOD_PASSWORD}}"
 }
 HTTP 200
 [Captures]
