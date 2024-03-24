@@ -7,7 +7,8 @@ from src.api.UserAPI import User
 from src.api.NoteAPI import Note
 from src.states.UserState import UpdateUser as upd_usr
 from src.states.NotesState import UpdateNote as upd_note
-
+from src.others.config_for_bot import ConfigUserData
+from src.handlers.commands import my_profile, my_notes
 
 #Callbacks router
 
@@ -18,6 +19,7 @@ clb_router: Router = Router()
 @clb_router.callback_query(DeleteUser())
 async def delete_user(msg: types.CallbackQuery):
     await msg.answer(text="Вы удалили свой профиль")
+    await msg.message.delete()
     User().del_user_by_token()
 
 
@@ -31,8 +33,8 @@ async def update_user(msg: types.CallbackQuery, state: FSMContext):
 ####Notes####
 @clb_router.callback_query(DeleteNote())
 async def delete_note(clb_data: types.CallbackQuery):
+    await clb_data.message.delete()
     await clb_data.answer(text="Вы удалили заметку")
-    print(clb_data.data)
     Note().del_note(id_note=clb_data.data)
 
 
@@ -43,3 +45,25 @@ async def update_note(clb_data: types.CallbackQuery, state: FSMContext):
     await state.update_data(guid=clb_data.data[:-4])
     await clb_data.message.answer(text="Ваш новый заголовок: ")
 
+
+####OTHERS#####
+@clb_router.callback_query()
+async def other_callbacks(clb_data: types.CallbackQuery):
+    """
+    Reaction to other callback btn
+    :param clb_data:
+    :return:
+    """
+
+
+    match clb_data.data:
+        case "btn_my_profile":
+            ConfigUserData.is_redirect = "/my_profile"
+            ConfigUserData.id_user = clb_data.message.from_user.id
+            await my_profile(clb_data.message)
+        case "btn_my_notes":
+            ConfigUserData.is_redirect = "/my_notes"
+            ConfigUserData.id_user = clb_data.message.from_user.id
+            await my_notes(clb_data.message)
+        case _:
+            await clb_data.message.answer(text="Не могу обработать ваш запрос")
