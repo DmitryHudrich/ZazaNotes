@@ -30,7 +30,7 @@ async def set_description_for_bot(bot):
     """
 
     return await bot(SetMyDescription(
-            description=f"{emoji.emojize(string=':moving_hand:', language='en')} Я бот Zaza, и я помогу тебе управлять своими заметками!\n\n" \
+            description=f"{emoji.emojize(string=':waving_hand:', language='en')} Я бот Zaza, и я помогу тебе управлять своими заметками!\n\n" \
             "Присоединяйся к нам!\n\nДля того, чтобы узнать все возможности бота введите /help",
         ),
     )
