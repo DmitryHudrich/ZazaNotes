@@ -15,9 +15,7 @@ services:
       - "27018:27017"
 
   bot:
-    build: ./ZazaBot/.
-    ports:
-      - "8081"
+    build: "https://github.com/darkfos/ZazaNotes.git#:ZazaBot"
     env_file:
       - ./ZazaBot/.env
     restart: always
