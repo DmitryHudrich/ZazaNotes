@@ -10,6 +10,7 @@ internal static class ArgumentManager {
             Flag = "--mongo",
             Decription = "MongoDb connection string. May be 'default' or 'exist' or 'mongodb://<host>:<port>'",
             Values = new Dictionary<string, Action<string>> {
+                { "test", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, StaticStuff.MongoStingDefault + "/test") },
                 { "default", (string _) => Environment.SetEnvironmentVariable(StaticStuff.MongoStingEnvName, StaticStuff.MongoStingDefault) },
                 { "exist", (string _) => { if (Environment.GetEnvironmentVariable(StaticStuff.MongoStingEnvName) == null) {
                     Environment.Exit(-2);
@@ -39,7 +40,7 @@ internal static class ArgumentManager {
             Decription =
                 "Included some interesting stuff for testing: \n" +
                 "   Ability to delete db.\n" +
-                "This option should be used only for testing purposes.",
+                "   !!! This option should be used only for testing purposes. !!!",
             IfFound = () => State.TestApi = true,
         },
         new Arg {
@@ -50,7 +51,7 @@ internal static class ArgumentManager {
                 Console.WriteLine("Example: dotnet Zaza.Web.dll --mongo default --swagger");
                 Console.WriteLine();
                 foreach (var arg in availableArgs!) {
-                    Console.WriteLine($"{arg.Flag} - {arg.Decription}");
+                    Console.WriteLine($"{arg.Flag} - {arg.Decription}\n");
                 }
                 Environment.Exit(0);
             }

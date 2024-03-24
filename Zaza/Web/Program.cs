@@ -51,7 +51,7 @@ app.Use(async (context, next) => {
     await next.Invoke();
 });
 
-RouteManager.SetEndpoints(app);
+RouteManager.SetEndpoints(app, app.Logger);
 app.Run();
 
 LogLevel LoadLogLevel() {

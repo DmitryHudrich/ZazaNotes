@@ -1,3 +1,7 @@
+POST {{HOST}}/testing/flush
+HTTP 202
+
+
 POST {{HOST}}/auth/reg
 Content-Type: application/json
 [Options]
@@ -21,11 +25,11 @@ Content-Type: application/json
     "login": "{{LOGIN}}",
     "password": "{{PASSWORD}}"
 }
-HTTP 204 | 200
+HTTP 200
 [Captures]
 JWT: body replace "\"" ""
 
 
 DELETE {{HOST}}/user
 Authorization: Bearer {{JWT}}
-HTTP 200
+HTTP 204

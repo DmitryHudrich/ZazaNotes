@@ -22,7 +22,7 @@ internal static class RoutingHelper {
 
 internal static class RouteManager {
     private static IEndpointRouteBuilder app = null!;
-    public static void SetEndpoints(IEndpointRouteBuilder webApp) {
+    public static void SetEndpoints(IEndpointRouteBuilder webApp, ILogger logger) {
         app = webApp;
         Auth();
         User();
@@ -30,6 +30,7 @@ internal static class RouteManager {
         Telegram();
         Health();
         if (State.TestApi) {
+            logger.LogWarning("TestApi enabled");
             Testing();
         }
     }
@@ -88,7 +89,8 @@ internal static class RouteManager {
     }
 
     private static void Testing() {
-        _ = app.MapPost("/testing/flush", () => {
+        _ = app.MapPost("/testing/flush", (ILogger<RouteEndpoint> logger) => {
+            logger.LogWarning("Db was flushed");
             _ = new DataBase.MongoService().Users.DeleteMany(new MongoDB.Bson.BsonDocument());
             return Results.Accepted();
         });
