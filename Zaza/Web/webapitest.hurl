@@ -3,10 +3,11 @@
 
 # bebra forever.
 
+# REGISTRATION
 POST {{HOST}}/auth/reg 
 Content-Type: application/json
 {
-  "login": "string1",
+  "login": "{{LOGIN}}",
   "info": {
     "firstName": "string",
     "lastName": "string",
@@ -14,21 +15,26 @@ Content-Type: application/json
     "country": "string",
     "photo": "string"
   },
-  "password": "string"
+  "password": "{{PASSWORD}}"
 }
-HTTP 401
+HTTP 201
+
 
 POST {{HOST}}/auth/login
 Content-Type: application/json
 {
-  "login": "string1",
-  "password": "string"
+  "login": "{{LOGIN}}",
+  "password": "{{PASSWORD}}"
 }
 HTTP 200
 [Captures]
 JWT: body replace "\"" ""
 
+
 GET {{HOST}}/user
 Authorization: Bearer {{JWT}}
 HTTP 200
 
+DELETE {{HOST}}/user
+Authorization: Bearer {{JWT}}
+HTTP 204

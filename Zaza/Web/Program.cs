@@ -4,6 +4,7 @@ using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
+using Zaza.Web.Stuff.InteractLogic;
 
 ArgumentManager.Check();
 
@@ -21,6 +22,8 @@ builder.Services.AddLogging(conf => conf.SetMinimumLevel(LoadLogLevel()));
 builder.Services.AddScoped<MongoService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<RepositoryContainer>();
+builder.Services.AddScoped<AuthInteractions>();
 builder.Services.AddCors();
 
 var app = builder.Build();

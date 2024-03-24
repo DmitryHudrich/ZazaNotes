@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
-
 using Microsoft.AspNetCore.Authorization;
-
 using Zaza.Web.DataBase.Entities;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.Exceptions;
@@ -9,6 +7,7 @@ using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.DTO.Response;
+using Zaza.Web.Stuff.InteractLogic;
 using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web;
@@ -30,6 +29,9 @@ internal static class RouteManager {
         Notes();
         Telegram();
         Health();
+        if (State.TestApi) {
+            Testing();
+        }
     }
 
     private static void Health() {
@@ -85,6 +87,13 @@ internal static class RouteManager {
         });
     }
 
+    private static void Testing() {
+        _ = app.MapPost("/testing/flush", () => {
+            _ = new DataBase.MongoService().Users.DeleteMany(new MongoDB.Bson.BsonDocument());
+            return Results.Accepted();
+        });
+    }
+
     private static void User() {
         _ = app.MapGet("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
@@ -134,21 +143,12 @@ internal static class RouteManager {
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
                 ? Results.BadRequest($"User: {context.GetName()} is not found or password is wrong")
-                : Results.NoContent();
+                    : Results.NoContent();
         });
 
-        _ = app.MapPost("/auth/reg", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserMainDTO user) => {
-            if (string.IsNullOrWhiteSpace(user.Password)) {
-                var err = $"{user.Login}: account didn't create, because password must contain more than zero symbols lol ";
-                logger.LogDebug(new ArgumentException(nameof(user.Password)), err);
-                return Results.BadRequest(err);
-            }
-            if (!await repository.AddAsync(user)) {
-                var err = $"{user} wasn't added to database";
-                logger.LogDebug(err);
-                return Results.Unauthorized();
-            };
-            return Results.Created();
+        _ = app.MapPost("/auth/reg", async (UserMainDTO user, AuthInteractions interactions) => {
+            var res = await interactions.RegisterUser(user);
+            return res.Success ? Results.Json(data: res, statusCode: 201) : Results.Json(data: res, statusCode: 400);
         });
 
         _ = app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {

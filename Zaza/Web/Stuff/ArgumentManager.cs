@@ -30,6 +30,19 @@ internal static class ArgumentManager {
             IfFound = () => State.UseSwagger = true,
         },
         new Arg {
+            Flag = "--bad-password",
+            Decription = "Disables password validation. This option should be used only for testing purposes.",
+            IfFound = () => State.DisablePasswordValidation = true,
+        },
+        new Arg {
+            Flag = "--test-api",
+            Decription =
+                "Included some interesting stuff for testing: \n" +
+                "   Ability to delete db.\n" +
+                "This option should be used only for testing purposes.",
+            IfFound = () => State.TestApi = true,
+        },
+        new Arg {
             Flag = "--h",
             Decription = "Show this help and exit",
             IfFound = () => {
