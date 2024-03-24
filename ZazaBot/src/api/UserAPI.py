@@ -3,6 +3,7 @@ import requests
 from src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram, UserUpdate
 from src.others.config_for_bot import ConfigUserData
 from src.others.profile_set_info import set_name
+from configuration import api_app
 
 
 class User:
@@ -12,7 +13,7 @@ class User:
         Initialize data
         """
 
-        self.app_url = "http://localhost:5000"
+        self.app_url = api_app
 
     def add_user(self, data_to_add: UserTelegram) -> str:
         """
@@ -22,7 +23,7 @@ class User:
         """
 
         data_to_add: dict = data_to_add.get_dict()
-        set_name(firstName=data_to_add.get("firstName"), lastName=data_to_add.get("lastName"))
+        set_name(firstname=data_to_add['firstName'], lastname=data_to_add['lastName'])
 
         req = requests.Session()
         req = req.post(

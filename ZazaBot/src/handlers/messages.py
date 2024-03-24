@@ -28,7 +28,6 @@ async def set_text_note(message: types.Message, state: FSMContext) -> None:
     await state.update_data(text=message.text)
     await message.answer(text="Заметка была успешно создана!")
 
-    #Тут должен быть create note, но их нет.
     note_to_add: AddNote = AddNote(
         **(await state.get_data())
     )
@@ -78,8 +77,9 @@ async def set_photo_user(message: types.Message, state: FSMContext):
 
         #Replace name user
         data: UserUpdate = UserUpdate(**(await state.get_data()))
+
         set_name(
-            firstName=data.firstName, lastName=data.lastName
+            firstname=data.get_dict()["firstName"], lastname=data.get_dict()["lastName"]
         )
 
         #Update user info
