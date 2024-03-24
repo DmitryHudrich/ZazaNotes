@@ -9,6 +9,7 @@ from src.api.NoteAPI import Note, AddNote
 from src.api.UserAPI import User
 from src.data.UserData import UserUpdate
 from src.data.NoteData import UpdateNote
+from src.others.profile_set_info import set_name
 
 
 #Message handler
@@ -75,10 +76,14 @@ async def set_photo_user(message: types.Message, state: FSMContext):
         await message.answer(text="Отлично, профиль обновлён!")
         await state.update_data(photo=dict(message.photo[0]).get("file_id"))
 
-        #Update user info
-        usr = User().update_user(
-            data_to_update=UserUpdate(**(await state.get_data()))
+        #Replace name user
+        data: UserUpdate = UserUpdate(**(await state.get_data()))
+        set_name(
+            firstName=data.firstName, lastName=data.lastName
         )
+
+        #Update user info
+        usr = User().update_user(data_to_update=data)
 
         if usr:
             await message.answer(text="Ваш профиль был успешно обновлён!")

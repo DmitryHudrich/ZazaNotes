@@ -2,6 +2,7 @@ import requests
 
 from src.data.UserData import AddUser, UserToken, UserInfo, UserTelegram, UserUpdate
 from src.others.config_for_bot import ConfigUserData
+from src.others.profile_set_info import set_name
 
 
 class User:
@@ -20,10 +21,13 @@ class User:
         :return:
         """
 
+        data_to_add: dict = data_to_add.get_dict()
+        set_name(firstName=data_to_add.get("firstName"), lastName=data_to_add.get("lastName"))
+
         req = requests.Session()
         req = req.post(
             url=self.app_url+"/telegram/auth",
-            json=data_to_add.get_dict()
+            json=data_to_add
         )
 
         ConfigUserData.cookies = dict(req.headers)

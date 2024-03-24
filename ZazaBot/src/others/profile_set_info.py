@@ -3,7 +3,7 @@ import logging
 from typing import List
 
 
-async def set_name(firstName: str, lastName: str) -> List[str]:
+def set_name(firstName: str, lastName: str) -> List[str]:
     """
     replace special symbols in string's
     :param firstName:
