@@ -159,7 +159,7 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
         var filter =
             Builders<UserEntity>.Filter.Eq(u => u.Login, login);
         var res = await mongo.Users.FindAsync(filter);
-        return res.First();
+        return res.FirstOrDefault();
     }
 
     private async Task<UserEntity?> FindByRefreshAsync(string refreshToken) {

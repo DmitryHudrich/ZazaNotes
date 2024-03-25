@@ -1,7 +1,3 @@
-POST {{HOST}}/testing/flush
-HTTP 202
-
-
 POST {{HOST}}/auth/reg
 Content-Type: application/json
 [Options]

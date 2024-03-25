@@ -8,6 +8,7 @@ using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.DTO.Response;
 using Zaza.Web.Stuff.InteractLogic.Auth;
+using Zaza.Web.Stuff.InteractLogic.User;
 
 namespace Zaza.Web;
 
@@ -101,18 +102,12 @@ internal static class RouteManager {
     }
 
     private static void User() {
-        // TODO: API REFACTOR
         _ = app.MapGet("/user", [Authorize]
-        async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
-            var user = await repository.FindByFilterAsync(FindFilter.ID, context.GetId());
-            if (user == null) {
-                var err = $"User {context.GetName()} wasn't found in db.";
-                logger.LogDebug(new UserNotFoundException(nameof(user)), err);
-                return Results.BadRequest(err);
-            }
-
-            var dto = new UserBodyResponse(user.Login, user.Info);
-            return Results.Json(dto);
+        async (UserInteractions intetactions, ILogger<RouteEndpoint> logger, HttpContext context) => {
+            var res = await intetactions.PullUserAsync(context);
+            return res.Success
+                ? Results.Json(data: res, statusCode: 200)
+                : Results.Json(data: res, statusCode: 400);
         });
 
         // TODO: API REFACTOR
@@ -120,8 +115,8 @@ internal static class RouteManager {
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
             var userStatus = await repository.DeleteByIdAsync(context.GetId());
             if (!userStatus) {
-                var err = $"User {context.GetName()} wasn't found or user doesn't have notes";
-                logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
+                var err = $"User {context.GetName()} wasn't found or user doesn't have notes"; logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
+
                 return Results.BadRequest(err);
             }
             return Results.NoContent();
@@ -158,14 +153,14 @@ internal static class RouteManager {
         });
 
         _ = app.MapPost("/auth/reg", async (UserMainDTO user, AuthInteractions interactions) => {
-            var res = await interactions.RegisterUser(user);
+            var res = await interactions.RegisterUserAsync(user);
             return res.Success
                 ? Results.Json(data: res, statusCode: 201)
                 : Results.Json(data: res, statusCode: 400);
         });
 
         _ = app.MapPost("/auth/login", async (AuthInteractions interactions, UserLoginRequestDTO loginRequest, HttpContext context) => {
-            var res = await interactions.LoginUser(loginRequest, context);
+            var res = await interactions.LoginUserAsync(loginRequest, context);
             return res.Success
                 ? Results.Json(data: res, statusCode: 200)
                 : Results.Json(data: res, statusCode: 401);
