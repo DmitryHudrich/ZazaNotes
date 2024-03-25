@@ -8,7 +8,6 @@ using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.DTO.Response;
 using Zaza.Web.Stuff.InteractLogic.Auth;
-using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web;
 
@@ -35,11 +34,13 @@ internal static class RouteManager {
         }
     }
 
+    // TODO: API REFACTOR IGNORE
     private static void Health() {
         _ = app.MapGet("/health/ping", () => "pong");
     }
 
     private static void Telegram() {
+        // TODO: API REFACTOR
         _ = app.MapPost("/telegram/auth", async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserTelegramDTO dto) => {
             var code = await repository.AddAsync(dto) ? 201 : 200;
             var user = await repository.FindByFilterAsync(FindFilter.TELEGRAM_ID, dto.Id);
@@ -49,6 +50,7 @@ internal static class RouteManager {
     }
 
     private static void Notes() {
+        // TODO: API REFACTOR
         _ = app.MapPost("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, NoteDTO note, INoteRepository notes) => {
             var res = Results.Ok();
@@ -62,6 +64,7 @@ internal static class RouteManager {
             return Results.Created();
         });
 
+        // TODO: API REFACTOR
         _ = app.MapDelete("/user/notes/{id:guid}", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, Guid id, INoteRepository repository) => {
             var status = await repository.DeleteNoteAsync(id);
@@ -74,6 +77,7 @@ internal static class RouteManager {
             return Results.NoContent();
         });
 
+        // TODO: API REFACTOR
         _ = app.MapPut("/user/notes", [Authorize]
         async (ILogger<RouteEndpoint> logger, HttpContext context, ChangedNoteDTO dto, INoteRepository notes) => {
             var status = await notes.ChangeNoteAsync(dto, context.GetId());
@@ -97,6 +101,7 @@ internal static class RouteManager {
     }
 
     private static void User() {
+        // TODO: API REFACTOR
         _ = app.MapGet("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context) => {
             var user = await repository.FindByFilterAsync(FindFilter.ID, context.GetId());
@@ -110,6 +115,7 @@ internal static class RouteManager {
             return Results.Json(dto);
         });
 
+        // TODO: API REFACTOR
         _ = app.MapDelete("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
             var userStatus = await repository.DeleteByIdAsync(context.GetId());
@@ -121,6 +127,7 @@ internal static class RouteManager {
             return Results.NoContent();
         });
 
+        // TODO: API REFACTOR
         _ = app.MapPut("/user", [Authorize]
         async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, UserInfo info, INoteRepository noteRepository) => {
             var userId = context.GetId();
@@ -132,6 +139,7 @@ internal static class RouteManager {
             }
         });
 
+        // TODO: API REFACTOR
         _ = app.MapGet("/user/notes", [Authorize]
         async (INoteRepository notesRep, HttpContext context) => {
             var userId = context.GetId();
@@ -141,6 +149,7 @@ internal static class RouteManager {
     }
 
     private static void Auth() {
+        // TODO: API REFACTOR
         _ = app.MapPost("/auth/password", [Authorize]
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
@@ -162,6 +171,7 @@ internal static class RouteManager {
                 : Results.Json(data: res, statusCode: 401);
         });
 
+        // TODO: API REFACTOR
         _ = app.MapGet("/auth/refresh", async (IUserRepository repository, HttpContext context) => {
             var username = context.Request.Cookies["X-Username"];
             var refresh = context.Request.Cookies["X-Refresh"] ?? string.Empty;
@@ -169,6 +179,7 @@ internal static class RouteManager {
             return user == null ? "саси" : TokenService.MakeJwt(user, context, StaticStuff.SecureCookieOptions);
         });
 
+        // TODO: API REFACTOR
         _ = app.MapGet("/auth/logout", (HttpContext context) => {
             var cookies = context.Response.Cookies;
 
