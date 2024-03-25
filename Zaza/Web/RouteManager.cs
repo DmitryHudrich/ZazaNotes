@@ -145,32 +145,21 @@ internal static class RouteManager {
         async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
             return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
                 ? Results.BadRequest($"User: {context.GetName()} is not found or password is wrong")
-                    : Results.NoContent();
+                : Results.NoContent();
         });
 
         _ = app.MapPost("/auth/reg", async (UserMainDTO user, AuthInteractions interactions) => {
             var res = await interactions.RegisterUser(user);
-            return res.Success ? Results.Json(data: res, statusCode: 201) : Results.Json(data: res, statusCode: 400);
+            return res.Success
+                ? Results.Json(data: res, statusCode: 201)
+                : Results.Json(data: res, statusCode: 400);
         });
 
-        _ = app.MapPost("/auth/login", async (IUserRepository repository, ILogger<RouteEndpoint> logger, UserLoginRequestDTO loginRequest, HttpContext context) => {
-            var login = loginRequest.Login;
-            var password = loginRequest.Password;
-            var user = await repository.FindByFilterAsync(FindFilter.LOGIN, login);
-            string err;
-
-            if (user == null) {
-                err = $"User {login} wasn't found";
-                logger.LogDebug(err);
-                return Results.BadRequest(err);
-            }
-            if (!HashHelper.Verify(password, user.Password.Hash)) {
-                err = $"User {login} password is wrong";
-                return Results.BadRequest(err);
-            }
-
-            return Results.Json(
-                    TokenService.MakeJwt(user!, context, StaticStuff.SecureCookieOptions));
+        _ = app.MapPost("/auth/login", async (AuthInteractions interactions, UserLoginRequestDTO loginRequest, HttpContext context) => {
+            var res = await interactions.LoginUser(loginRequest, context);
+            return res.Success
+                ? Results.Json(data: res, statusCode: 200)
+                : Results.Json(data: res, statusCode: 401);
         });
 
         _ = app.MapGet("/auth/refresh", async (IUserRepository repository, HttpContext context) => {

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using Zaza.Web.DataBase.Entities;
 using Zaza.Web.StorageInterfaces;
+using Zaza.Web.Stuff.DTO.Response;
 
 namespace Zaza.Web.Stuff;
 
@@ -15,7 +16,7 @@ internal static class TokenService {
         return new RefreshToken(Convert.ToBase64String(randomNumber), TimeSpan.FromDays(expireFromDays));
     }
 
-    public static string MakeJwt(UserEntity user, HttpContext context, CookieOptions cookieOptions) {
+    public static JwtToken MakeJwt(UserEntity user, HttpContext context, CookieOptions cookieOptions) {
         var logger = context.RequestServices.GetRequiredService<ILogger<JwtSecurityToken>>();
 
         var claims = new List<Claim>();

@@ -1,6 +1,7 @@
 POST {{HOST}}/testing/flush
 HTTP 202
 
+
 POST {{HOST}}/auth/reg
 Content-Type: application/json
 [Options]
@@ -41,11 +42,22 @@ POST {{HOST}}/auth/login
 Content-Type: application/json
 {
     "login": "{{LOGIN}}",
+    "password": "{{BAD_PASSWORD}}"
+}
+HTTP 401
+
+
+POST {{HOST}}/auth/login
+Content-Type: application/json
+[Options]
+very-verbose: true
+{
+    "login": "{{LOGIN}}",
     "password": "{{GOOD_PASSWORD}}"
 }
 HTTP 200
 [Captures]
-JWT: body replace "\"" ""
+JWT: jsonpath "$['data']['token']"
 
 
 DELETE {{HOST}}/user
