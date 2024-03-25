@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "telegrambot"
+version = "0.1.0"
+description = "TelegramBot for Zaza project"
+authors = ["DarkFos <darkfos82@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.31.0"
+aiogram = {extras = ["all"], version = "^3.4.1"}
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
