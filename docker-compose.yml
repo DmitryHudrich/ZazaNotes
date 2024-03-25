@@ -9,6 +9,7 @@ services:
         MONGO_URI: "mongodb://db:27017"
     depends_on:
       - db
+      
   db:
     image: mongo
     ports:
