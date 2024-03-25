@@ -1,9 +1,8 @@
-﻿
-using Zaza.Web.StorageInterfaces;
+﻿using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.InteractLogic.InteractServices;
 
-namespace Zaza.Web.Stuff.InteractLogic;
+namespace Zaza.Web.Stuff.InteractLogic.Auth;
 
 internal enum InteractEvent {
     AUTHORIZATION,
@@ -57,9 +56,6 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
     }
 
     public async Task<InteractResult> LoginUser(UserLoginRequestDTO userDTO) {
-        if (!State.DisablePasswordValidation) {
-
-        }
         if (string.IsNullOrWhiteSpace(userDTO.Password)) {
             var err = $"{userDTO.Login}: account didn't create, because password must contain more than zero symbols lol ";
         }

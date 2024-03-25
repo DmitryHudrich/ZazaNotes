@@ -7,7 +7,7 @@ using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
 using Zaza.Web.Stuff.DTO.Request;
 using Zaza.Web.Stuff.DTO.Response;
-using Zaza.Web.Stuff.InteractLogic;
+using Zaza.Web.Stuff.InteractLogic.Auth;
 using Zaza.Web.Stuff.StaticServices;
 
 namespace Zaza.Web;

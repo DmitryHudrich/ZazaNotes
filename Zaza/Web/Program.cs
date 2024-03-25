@@ -4,7 +4,7 @@ using Zaza.Web.DataBase;
 using Zaza.Web.DataBase.Repository;
 using Zaza.Web.StorageInterfaces;
 using Zaza.Web.Stuff;
-using Zaza.Web.Stuff.InteractLogic;
+using Zaza.Web.Stuff.InteractLogic.Auth;
 
 ArgumentManager.Check();
 
