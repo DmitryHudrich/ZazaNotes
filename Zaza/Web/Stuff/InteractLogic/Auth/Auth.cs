@@ -1,25 +1,6 @@
-﻿using Zaza.Web.StorageInterfaces;
-using Zaza.Web.Stuff.DTO.Request;
-using Zaza.Web.Stuff.InteractLogic.InteractServices;
+﻿using Zaza.Web.Stuff.DTO.Request;
 
 namespace Zaza.Web.Stuff.InteractLogic.Auth;
-
-internal enum InteractEvent {
-    AUTHORIZATION,
-    CREATION,
-    DELETION,
-    CHANGE,
-    RECEIVING
-}
-
-internal record class InteractResult(bool Success, InteractEvent Event, string? Error = default);
-internal record class InteractResult<T>(bool Success, InteractEvent Event, T? Data = default, string? Error = default);
-
-internal abstract class InteractAbstract(ILogger<InteractAbstract> logger, RepositoryContainer repositories) {
-    protected ILogger<InteractAbstract> Logger => logger;
-    protected IUserRepository UserRepository => repositories.ForUser;
-    protected INoteRepository NoteRepository => repositories.ForNotes;
-}
 
 internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, RepositoryContainer repositoryContainer) :
     InteractAbstract(logger, repositoryContainer) {
