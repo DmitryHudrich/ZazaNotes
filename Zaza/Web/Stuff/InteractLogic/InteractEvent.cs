@@ -1,4 +1,4 @@
-﻿namespace Zaza.Web.Stuff.InteractLogic.Auth;
+﻿namespace Zaza.Web.Stuff.InteractLogic;
 
 internal enum InteractEvent {
     AUTHORIZATION,
