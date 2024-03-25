@@ -6,6 +6,7 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
     InteractAbstract(logger, repositoryContainer) {
 
     public async Task<InteractResult<PasswordQuality>> RegisterUser(UserMainDTO userDTO) {
+        const InteractEvent INTERACT_EVENT = InteractEvent.AUTHORIZATION;
         var passwordQuality = PasswordQuality.STRONG;
         var status = true;
 
@@ -15,10 +16,10 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
         status = await CheckPasswordQuality(userDTO, passwordQuality, status);
 
         var res = passwordQuality switch {
-            PasswordQuality.STRONG => new InteractResult<PasswordQuality>(status, InteractEvent.AUTHORIZATION, passwordQuality),
-            PasswordQuality.GOOD => new InteractResult<PasswordQuality>(status, InteractEvent.AUTHORIZATION, passwordQuality),
-            PasswordQuality.WEAK => new InteractResult<PasswordQuality>(status, InteractEvent.AUTHORIZATION, passwordQuality),
-            PasswordQuality.BAD => new InteractResult<PasswordQuality>(status, InteractEvent.AUTHORIZATION, passwordQuality, "Bad password"),
+            PasswordQuality.STRONG => new InteractResult<PasswordQuality>(status, INTERACT_EVENT, passwordQuality),
+            PasswordQuality.GOOD => new InteractResult<PasswordQuality>(status, INTERACT_EVENT, passwordQuality),
+            PasswordQuality.WEAK => new InteractResult<PasswordQuality>(status, INTERACT_EVENT, passwordQuality),
+            PasswordQuality.BAD => new InteractResult<PasswordQuality>(status, INTERACT_EVENT, passwordQuality, "Bad password"),
             _ => throw new ArgumentException("Unknown password quality"),
         };
 
@@ -69,6 +70,7 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
             4 => PasswordQuality.STRONG,
             _ => PasswordQuality.STRONG
         };
+
         return res;
     }
 }
