@@ -56,7 +56,6 @@ internal static class ArgumentManager {
                 Environment.Exit(0);
             }
         }
-
     ];
 
     public static void Check() {
