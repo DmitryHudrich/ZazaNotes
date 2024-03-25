@@ -15,7 +15,7 @@ services:
       - "27018:27017"
 
   bot:
-    build: "https://github.com/darkfos/ZazaNotes.git#:ZazaBot"
+    build: "https://github.com/DmitryHudrich/ZazaNotes.git#:ZazaBot"
     env_file:
       - ./ZazaBot/.env
     restart: always
