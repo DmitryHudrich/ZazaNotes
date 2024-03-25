@@ -8,13 +8,13 @@ internal class UserInteractions(ILogger<UserInteractions> logger, RepositoryCont
     public async Task<InteractResult<UserEntity?>> PullUser(Guid id) {
         const InteractEvent INTERACT_EVENT = InteractEvent.RECEIVING;
         var user = await UserRepository.FindByFilterAsync(FindFilter.ID, id);
-        var res = new InteractResult<UserEntity?>(Success: true, Event: INTERACT_EVENT, Data: user);
+        var res = new Lazy<InteractResult<UserEntity?>>(() => new InteractResult<UserEntity?>(Success: true, Event: INTERACT_EVENT, Data: user));
         if (user == null) {
             var err = $"User {id} wasn't found in db.";
             logger.LogDebug($"{nameof(PullUser)}: " + err);
-            res = new InteractResult<UserEntity?>(Success: false, Event: INTERACT_EVENT, Data: user, Error: err);
+            res = new Lazy<InteractResult<UserEntity?>>(() => new InteractResult<UserEntity?>(Success: false, Event: INTERACT_EVENT, Data: user, Error: err));
         }
 
-        return res;
+        return res.Value;
     }
 }
