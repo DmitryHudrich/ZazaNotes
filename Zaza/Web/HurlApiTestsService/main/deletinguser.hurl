@@ -3,7 +3,7 @@ Content-Type: application/json
 [Options]
 very-verbose: false
 {
-    "login": "{{MAIN_LOGIN}}",
+    "login": "BEBRUN123",
     "info": {
         "firstName": "string",
         "lastName": "string",
@@ -14,4 +14,24 @@ very-verbose: false
     "password": "{{GOOD_PASSWORD}}"
 }
 HTTP 201
+
+POST {{HOST}}/auth/login
+{
+    "login": "BEBRUN123",
+    "password": "{{GOOD_PASSWORD}}"
+}
+HTTP 200
+[Captures]
+JWT: jsonpath "$['token']"
+
+
+DELETE {{HOST}}/user
+Authorization: Bearer {{JWT}}
+HTTP 204
+
+
+DELETE {{HOST}}/user
+Authorization: Bearer {{JWT}}
+[Options]
+HTTP 400
 

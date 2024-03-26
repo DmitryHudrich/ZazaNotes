@@ -6,7 +6,7 @@ namespace Zaza.Web.StorageInterfaces;
 
 internal interface IUserRepository {
     Task ChangeTelegramId(Guid userId, ulong telegramId);
-    Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword);
+    Task<bool> ChangePasswordAsync(Guid id, string oldPassword, string newPassword);
     Task<bool> AddAsync(UserMainDTO user);
     Task<bool> AddAsync(UserTelegramDTO user);
     Task<bool> ChangeInfoAsync(Guid id, UserInfo newInfo);

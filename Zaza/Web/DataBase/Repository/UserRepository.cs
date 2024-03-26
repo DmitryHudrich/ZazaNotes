@@ -7,15 +7,15 @@ using Zaza.Web.Stuff.StaticServices;
 namespace Zaza.Web.DataBase.Repository;
 
 internal sealed class UserRepository(ILogger<UserRepository> logger, MongoService mongo) : IUserRepository {
-    public async Task<bool> ChangePasswordAsync(string login, string oldPassword, string newPassword) {
+    public async Task<bool> ChangePasswordAsync(Guid id, string oldPassword, string newPassword) {
         var filter =
-            Builders<UserEntity>.Filter.Eq(u => u.Login, login) &
+            Builders<UserEntity>.Filter.Eq(u => u.Id, id) &
             Builders<UserEntity>.Filter.Eq(u => u.Password.Hash, HashHelper.Hash(oldPassword));
         var update = Builders<UserEntity>.Update.Set(u => u.Password.Hash, HashHelper.Hash(newPassword));
 
         var result = await mongo.Users.FindOneAndUpdateAsync(filter, update);
         if (result == null) {
-            logger.LogDebug($"User: {login} isn't exist or password is wrong");
+            logger.LogDebug($"User: {id} isn't exist or password is wrong");
             return false;
         }
 
@@ -71,11 +71,9 @@ internal sealed class UserRepository(ILogger<UserRepository> logger, MongoServic
     private async Task<bool> AddToDb(UserEntity user, FilterDefinition<UserEntity>? filter) {
         var item = user;
         var exists = await mongo.Users.FindAsync(filter);
-        var exists1 = await mongo.Users.FindAsync(filter);
 
-        if (exists.Any()) {
+        if (await exists.AnyAsync()) {
             logger.LogDebug($"User: {user.Login} already exists");
-            logger.LogDebug($"User id: {exists1.ToList().FirstOrDefault()}");
             return false;
         }
         await mongo.Users.InsertOneAsync(item);

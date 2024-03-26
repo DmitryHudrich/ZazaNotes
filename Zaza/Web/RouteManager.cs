@@ -95,7 +95,10 @@ internal static class RouteManager {
 
     private static void Testing() {
         _ = app.MapPost("/testing/flush", (ILogger<RouteEndpoint> logger) => {
-            logger.LogWarning("Db was flushed");
+            logger.LogWarning(
+                    "-------------------------------\n" +
+                    "FLUSHING DATABASE\n" +
+                    "-------------------------------");
             _ = new DataBase.MongoService().Users.DeleteMany(new MongoDB.Bson.BsonDocument());
             return Results.Accepted();
         });
@@ -106,20 +109,16 @@ internal static class RouteManager {
         async (UserInteractions intetactions, ILogger<RouteEndpoint> logger, HttpContext context) => {
             var res = await intetactions.PullUserAsync(context);
             return res.Success
-                ? Results.Json(data: res, statusCode: 200)
-                : Results.Json(data: res, statusCode: 400);
+                ? Results.Json(data: res.Data, statusCode: 200)
+                : Results.Json(data: res.Data, statusCode: 400);
         });
 
-        // TODO: API REFACTOR
         _ = app.MapDelete("/user", [Authorize]
-        async (IUserRepository repository, ILogger<RouteEndpoint> logger, HttpContext context, INoteRepository noteRepository) => {
-            var userStatus = await repository.DeleteByIdAsync(context.GetId());
-            if (!userStatus) {
-                var err = $"User {context.GetName()} wasn't found or user doesn't have notes"; logger.LogDebug(new EnitityNotFoundException($"User: {userStatus}"), err);
-
-                return Results.BadRequest(err);
-            }
-            return Results.NoContent();
+        async (HttpContext context, UserInteractions interactions) => {
+            var res = await interactions.DeleteUserAsync(context);
+            return res.Success
+                ? Results.NoContent()
+                : Results.BadRequest(res.Error);
         });
 
         // TODO: API REFACTOR
@@ -144,26 +143,26 @@ internal static class RouteManager {
     }
 
     private static void Auth() {
-        // TODO: API REFACTOR
         _ = app.MapPost("/auth/password", [Authorize]
-        async (HttpContext context, ChangePasswordDTO user, IUserRepository repository) => {
-            return !await repository.ChangePasswordAsync(context.GetName(), user.OldPassword, user.NewPassword)
-                ? Results.BadRequest($"User: {context.GetName()} is not found or password is wrong")
-                : Results.NoContent();
+        async (HttpContext context, ChangePasswordDTO user, AuthInteractions interactions) => {
+            var res = await interactions.ChangeUserPasswordAsync(context, user);
+            return res.Success
+                ? Results.Ok()
+                : Results.BadRequest(res.Error);
         });
 
         _ = app.MapPost("/auth/reg", async (UserMainDTO user, AuthInteractions interactions) => {
             var res = await interactions.RegisterUserAsync(user);
             return res.Success
-                ? Results.Json(data: res, statusCode: 201)
-                : Results.Json(data: res, statusCode: 400);
+                ? Results.Json(data: res.Data, statusCode: 201)
+                : Results.Json(data: res.Data, statusCode: 400);
         });
 
         _ = app.MapPost("/auth/login", async (AuthInteractions interactions, UserLoginRequestDTO loginRequest, HttpContext context) => {
-            var res = await interactions.LoginUserAsync(loginRequest, context);
+            var res = await interactions.LoginUserAsync(context, loginRequest);
             return res.Success
-                ? Results.Json(data: res, statusCode: 200)
-                : Results.Json(data: res, statusCode: 401);
+                ? Results.Json(data: res.Data, statusCode: 200)
+                : Results.Json(data: res.Data, statusCode: 401);
         });
 
         // TODO: API REFACTOR

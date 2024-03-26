@@ -53,7 +53,7 @@ very-verbose: true
 }
 HTTP 200
 [Captures]
-JWT: jsonpath "$['data']['token']"
+JWT: jsonpath "$['token']"
 
 
 DELETE {{HOST}}/user

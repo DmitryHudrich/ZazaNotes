@@ -3,7 +3,7 @@
 internal enum InteractEvent {
     AUTHORIZATION,
     CREATION,
-    DELETION,
+    DELETING,
     CHANGE,
     RECEIVING
 }

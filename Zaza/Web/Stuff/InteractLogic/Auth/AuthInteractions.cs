@@ -29,7 +29,7 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
         return res;
     }
 
-    public async Task<InteractResult<JwtToken>> LoginUserAsync(UserLoginRequestDTO userDTO, HttpContext context) {
+    public async Task<InteractResult<JwtToken>> LoginUserAsync(HttpContext context, UserLoginRequestDTO userDTO) {
         var user = await UserRepository.FindByFilterAsync(FindFilter.LOGIN, userDTO.Login);
         return user is null
             ? ResultHelper("User not found.")
@@ -41,6 +41,20 @@ internal sealed class AuthInteractions(ILogger<AuthInteractions> logger, Reposit
             logger.LogDebug($"{nameof(LoginUserAsync)}: {err}");
             return new InteractResult<JwtToken>(Success: false, Event: INTERACT_EVENT, Error: err);
         }
+    }
+
+    public async Task<InteractResult> ChangeUserPasswordAsync(HttpContext context, ChangePasswordDTO dto) => await ChangeUserPasswordAsync(context.GetId(), dto);
+    public async Task<InteractResult> ChangeUserPasswordAsync(Guid id, ChangePasswordDTO dto) {
+        logger.LogDebug($"{nameof(ChangeUserPasswordAsync)}: changing password for {id}");
+        var passwordQuality = ValidatePassword(dto.NewPassword);
+        if (passwordQuality == PasswordQuality.BAD) {
+            var err = $"Password is too weak";
+            logger.LogDebug($"{nameof(ChangeUserPasswordAsync)}: {err}");
+            return new InteractResult(Success: false, Event: InteractEvent.CHANGE, Error: err);
+        }
+        return await UserRepository.ChangePasswordAsync(id, dto.OldPassword, dto.NewPassword)
+                        ? new InteractResult(Success: true, Event: InteractEvent.CHANGE)
+                        : new InteractResult(Success: false, Event: InteractEvent.CHANGE, Error: $"User: {id} is not found or password is wrong");
     }
 
     private async Task<bool> CheckPasswordQuality(UserMainDTO userDTO, PasswordQuality passwordQuality, bool status) {
